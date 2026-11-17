@@ -130,6 +130,13 @@ def main():
         f.write(INDICE.format(css=css, lista=lista))
     print(f"  ✅ index.html ({len(entradas)} artículos)")
 
+    # 17-11-2026 · El nombre propio del taller. GitHub Pages lee esto para saber
+    # qué dominio sirve: si se pierde al reconstruir, el sitio vuelve a la dirección
+    # fea de github.io y el certificado deja de aplicar.
+    with open(os.path.join(SITIO, "CNAME"), "w", encoding="utf-8") as f:
+        f.write("taller.dantehef.dev\n")
+    print("  ✅ CNAME (taller.dantehef.dev)")
+
 
 if __name__ == "__main__":
     main()
