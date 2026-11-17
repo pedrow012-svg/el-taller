@@ -26,4 +26,4 @@ Y luego el texto. **Regla de la casa:** ningún número sin su fichero de result
 
 ## Publicar
 
-Construido en local. **Publicarlo es palabra del Soberano**: aquí solo se forja.
+Construido en local. **Publicar es decisión de Pedro**: aquí solo se forja.
