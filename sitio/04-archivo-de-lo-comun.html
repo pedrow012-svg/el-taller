@@ -304,6 +304,163 @@ comparador.</strong> El dato malo y la necesidad real apuntan al mismo sitio.</p
   número bajo al lado de un eccema no es un diagnóstico peor: es un archivo que no está
   hecho para eso todavía.</li>
 </ul>
+<h2>La medida completa: 3.060 casos y 211 enfermedades en juego</h2>
+<p>El piloto dejó una pregunta abierta: <strong>¿cuánto baja el acierto cuando el archivo no tiene nueve
+enfermedades, sino todas las que tiene?</strong> Ya está medido, y es la cifra que importa para una
+herramienta de verdad: <strong>3.060 fotos, una por caso con diagnóstico, 211 enfermedades distintas.</strong></p>
+<table>
+<thead>
+<tr>
+<th>qué se mide</th>
+<th>piloto (9 enfermedades)</th>
+<th><strong>completo (211 enfermedades)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>el 1º parecido es de la misma enfermedad</strong></td>
+<td>42,2 %</td>
+<td><strong>19,8 %</strong></td>
+</tr>
+<tr>
+<td><strong>alguno de los 5 lo es</strong></td>
+<td>78,8 %</td>
+<td><strong>47,8 %</strong></td>
+</tr>
+<tr>
+<td>azar (decir siempre la más común)</td>
+<td>11,4 %</td>
+<td>5,1 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>La bajada no es un fallo de la medida: es la pregunta.</strong> Con nueve enfermedades entre las que
+elegir, acertar es más fácil. Con <strong>211</strong> —casi todas parecidas de dos en dos, y muchas con menos
+de cinco casos— el primer puesto se vuelve mucho más duro. <strong>El número honesto para una
+herramienta real es el segundo: uno de cada cinco.</strong></p>
+<p>Las enfermedades frecuentes, con su acierto al primer parecido en el corpus completo:</p>
+<table>
+<thead>
+<tr>
+<th>enfermedad</th>
+<th>casos</th>
+<th>acierto al 1º</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>rosácea</strong></td>
+<td>29</td>
+<td><strong>44,8 %</strong></td>
+</tr>
+<tr>
+<td>urticaria</td>
+<td>214</td>
+<td>38,3 %</td>
+</tr>
+<tr>
+<td>acné</td>
+<td>61</td>
+<td>36,1 %</td>
+</tr>
+<tr>
+<td>tiña versicolor</td>
+<td>37</td>
+<td>35,1 %</td>
+</tr>
+<tr>
+<td>eccema</td>
+<td>488</td>
+<td>29,1 %</td>
+</tr>
+<tr>
+<td>herpes simple</td>
+<td>55</td>
+<td>29,1 %</td>
+</tr>
+<tr>
+<td>exantema por fármacos</td>
+<td>58</td>
+<td>25,9 %</td>
+</tr>
+<tr>
+<td>hongos (tiña)</td>
+<td>92</td>
+<td>25,0 %</td>
+</tr>
+<tr>
+<td>psoriasis</td>
+<td>109</td>
+<td>22,0 %</td>
+</tr>
+<tr>
+<td>herpes zóster</td>
+<td>68</td>
+<td>22,1 %</td>
+</tr>
+<tr>
+<td>dermatitis de contacto alérgica</td>
+<td>270</td>
+<td>21,1 %</td>
+</tr>
+<tr>
+<td>pitiriasis rosada</td>
+<td>44</td>
+<td>20,5 %</td>
+</tr>
+<tr>
+<td>foliculitis</td>
+<td>142</td>
+<td>18,3 %</td>
+</tr>
+<tr>
+<td>impétigo</td>
+<td>69</td>
+<td>17,4 %</td>
+</tr>
+<tr>
+<td>picaduras</td>
+<td>185</td>
+<td>16,8 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Y aquí está el dato que cierra una discusión de esta casa, con la boca llena: la familia de la
+dermatitis de contacto es, para este comparador, prácticamente invisible.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>casos</th>
+<th>acierto al 1º</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dermatitis irritativa</td>
+<td>39</td>
+<td><strong>0 %</strong></td>
+</tr>
+<tr>
+<td>dermatitis de contacto (sin especificar)</td>
+<td>36</td>
+<td><strong>2,8 %</strong></td>
+</tr>
+<tr>
+<td>«acute dermatitis, NOS»</td>
+<td>46</td>
+<td><strong>2,2 %</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cero de treinta y nueve.</strong> No es que acierte poco: es que <strong>el parecido de imagen no distingue
+una dermatitis irritativa de todo lo demás.</strong> Y no es una desgracia, es una lección: <strong>una médica
+del trabajo dijo que las lesiones que ella ve son fáciles de diagnosticar porque las causa un
+agente identificado.</strong> Es decir, <strong>la clase que este motor no ve es justo la que un profesional
+resuelve con la historia del paciente y no con una foto.</strong></p>
+<p><strong>⇒ El comparador no sustituye a esa mirada: sirve para las enfermedades en las que la imagen
+lleva la información —urticaria, rosácea, acné, hongos—, y no para las que se resuelven
+preguntando.</strong> Saber cuál es cuál es exactamente lo que hace útil la herramienta.</p>
 <h2>Las fronteras de esta medida</h2>
 <ol>
 <li><strong>424 fotos, 9 enfermedades, una sola foto por caso.</strong> Es un piloto, no un censo.</li>
@@ -311,13 +468,17 @@ comparador.</strong> El dato malo y la necesidad real apuntan al mismo sitio.</p
 <li><strong>Fotos de móvil donadas en Estados Unidos</strong>, con los fototipos que allí hay. Fuera de ahí
    vale menos, igual que en el archivo de tumores.</li>
 <li><strong>La etiqueta es de dermatólogo mirando la foto</strong>, no una biopsia.</li>
-<li><strong>Y lo que falta:</strong> la medida sobre <strong>los 3.061 casos completos</strong>. Cuando esté, este
-   artículo se corrige aquí mismo, con su fecha.</li>
+<li><strong>La medida completa se hizo el mismo día</strong> y está arriba: <strong>3.060 fotos, 211 enfermedades,
+   19,8 % al primer parecido.</strong> Lo que sigue faltando es <strong>un archivo con biopsia para lo común</strong>
+   —en SCIN la etiqueta es de dermatólogo mirando la foto— y <strong>probar otro codificador</strong>, porque
+   todo esto está medido con uno solo.</li>
 </ol>
 <h2>Los ficheros</h2>
 <ul>
 <li>Medidor: <code>~/Orfeo_Core/medidas/mide_acierto_scin.py</code></li>
 <li>Muestra medida y vectores en caché: <code>scin_piloto/</code> (425 fotos, 511 MB)</li>
+<li><strong>Corpus completo medido: <code>scin_completo/</code> (3.061 fotos, una por caso, 3,7 GB)</strong>; la salida, en
+  <code>medida_completa.txt</code></li>
 <li>Etiquetas y casos: <code>scin_labels.csv</code>, <code>scin_cases.csv</code> (descargados del cubo público de SCIN)</li>
 <li>Comando: <code>python3 medidas/mide_acierto_scin.py scin_piloto lista.tsv</code></li>
 <li>Fecha de la medida: <strong>17 de noviembre de 2026</strong></li>

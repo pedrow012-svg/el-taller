@@ -133,6 +133,62 @@ comparador.** El dato malo y la necesidad real apuntan al mismo sitio.
   número bajo al lado de un eccema no es un diagnóstico peor: es un archivo que no está
   hecho para eso todavía.
 
+## La medida completa: 3.060 casos y 211 enfermedades en juego
+
+El piloto dejó una pregunta abierta: **¿cuánto baja el acierto cuando el archivo no tiene nueve
+enfermedades, sino todas las que tiene?** Ya está medido, y es la cifra que importa para una
+herramienta de verdad: **3.060 fotos, una por caso con diagnóstico, 211 enfermedades distintas.**
+
+| qué se mide | piloto (9 enfermedades) | **completo (211 enfermedades)** |
+|---|---|---|
+| **el 1º parecido es de la misma enfermedad** | 42,2 % | **19,8 %** |
+| **alguno de los 5 lo es** | 78,8 % | **47,8 %** |
+| azar (decir siempre la más común) | 11,4 % | 5,1 % |
+
+**La bajada no es un fallo de la medida: es la pregunta.** Con nueve enfermedades entre las que
+elegir, acertar es más fácil. Con **211** —casi todas parecidas de dos en dos, y muchas con menos
+de cinco casos— el primer puesto se vuelve mucho más duro. **El número honesto para una
+herramienta real es el segundo: uno de cada cinco.**
+
+Las enfermedades frecuentes, con su acierto al primer parecido en el corpus completo:
+
+| enfermedad | casos | acierto al 1º |
+|---|---|---|
+| **rosácea** | 29 | **44,8 %** |
+| urticaria | 214 | 38,3 % |
+| acné | 61 | 36,1 % |
+| tiña versicolor | 37 | 35,1 % |
+| eccema | 488 | 29,1 % |
+| herpes simple | 55 | 29,1 % |
+| exantema por fármacos | 58 | 25,9 % |
+| hongos (tiña) | 92 | 25,0 % |
+| psoriasis | 109 | 22,0 % |
+| herpes zóster | 68 | 22,1 % |
+| dermatitis de contacto alérgica | 270 | 21,1 % |
+| pitiriasis rosada | 44 | 20,5 % |
+| foliculitis | 142 | 18,3 % |
+| impétigo | 69 | 17,4 % |
+| picaduras | 185 | 16,8 % |
+
+**Y aquí está el dato que cierra una discusión de esta casa, con la boca llena: la familia de la
+dermatitis de contacto es, para este comparador, prácticamente invisible.**
+
+| | casos | acierto al 1º |
+|---|---|---|
+| dermatitis irritativa | 39 | **0 %** |
+| dermatitis de contacto (sin especificar) | 36 | **2,8 %** |
+| «acute dermatitis, NOS» | 46 | **2,2 %** |
+
+**Cero de treinta y nueve.** No es que acierte poco: es que **el parecido de imagen no distingue
+una dermatitis irritativa de todo lo demás.** Y no es una desgracia, es una lección: **una médica
+del trabajo dijo que las lesiones que ella ve son fáciles de diagnosticar porque las causa un
+agente identificado.** Es decir, **la clase que este motor no ve es justo la que un profesional
+resuelve con la historia del paciente y no con una foto.**
+
+**⇒ El comparador no sustituye a esa mirada: sirve para las enfermedades en las que la imagen
+lleva la información —urticaria, rosácea, acné, hongos—, y no para las que se resuelven
+preguntando.** Saber cuál es cuál es exactamente lo que hace útil la herramienta.
+
 ## Las fronteras de esta medida
 
 1. **424 fotos, 9 enfermedades, una sola foto por caso.** Es un piloto, no un censo.
@@ -140,13 +196,17 @@ comparador.** El dato malo y la necesidad real apuntan al mismo sitio.
 3. **Fotos de móvil donadas en Estados Unidos**, con los fototipos que allí hay. Fuera de ahí
    vale menos, igual que en el archivo de tumores.
 4. **La etiqueta es de dermatólogo mirando la foto**, no una biopsia.
-5. **Y lo que falta:** la medida sobre **los 3.061 casos completos**. Cuando esté, este
-   artículo se corrige aquí mismo, con su fecha.
+5. **La medida completa se hizo el mismo día** y está arriba: **3.060 fotos, 211 enfermedades,
+   19,8 % al primer parecido.** Lo que sigue faltando es **un archivo con biopsia para lo común**
+   —en SCIN la etiqueta es de dermatólogo mirando la foto— y **probar otro codificador**, porque
+   todo esto está medido con uno solo.
 
 ## Los ficheros
 
 - Medidor: `~/Orfeo_Core/medidas/mide_acierto_scin.py`
 - Muestra medida y vectores en caché: `scin_piloto/` (425 fotos, 511 MB)
+- **Corpus completo medido: `scin_completo/` (3.061 fotos, una por caso, 3,7 GB)**; la salida, en
+  `medida_completa.txt`
 - Etiquetas y casos: `scin_labels.csv`, `scin_cases.csv` (descargados del cubo público de SCIN)
 - Comando: `python3 medidas/mide_acierto_scin.py scin_piloto lista.tsv`
 - Fecha de la medida: **17 de noviembre de 2026**
