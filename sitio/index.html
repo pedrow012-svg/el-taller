@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El Taller · medidas, pruebas y lo que se rompe</title>
+<meta name="description" content="Medidas reales de modelos de lenguaje en hardware de casa.">
+<style>:root{--fondo:#111418;--papel:#171b21;--tinta:#e6e9ee;--tenue:#98a2b3;--acento:#e0a458;--linea:#2a313b;
+--mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+--texto:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+@media(prefers-color-scheme:light){:root{--fondo:#fbfaf7;--papel:#fff;--tinta:#1b1f24;--tenue:#5b6672;
+--acento:#a5641a;--linea:#e3ded4}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:17px/1.65 var(--texto);
+-webkit-font-smoothing:antialiased}
+main{max-width:43rem;margin:0 auto;padding:3rem 1.25rem 6rem}
+a{color:var(--acento);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--acento)}
+header.casa{border-bottom:1px solid var(--linea);padding-bottom:1.5rem;margin-bottom:2.5rem}
+header.casa .marca{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin:0}
+header.casa .lema{color:var(--tenue);font-size:.95rem;margin:.35rem 0 0}
+h1{font-size:1.85rem;line-height:1.25;letter-spacing:-.02em;margin:0 0 .6rem}
+h2{font-size:1.25rem;margin:2.5rem 0 .75rem;letter-spacing:-.01em}
+h3{font-size:1.05rem;margin:1.75rem 0 .5rem}
+.meta{color:var(--tenue);font-size:.9rem;margin-bottom:2rem;font-family:var(--mono)}
+.resumen{color:var(--tenue);margin:.4rem 0 0}
+code{font-family:var(--mono);font-size:.9em;background:var(--papel);padding:.15em .4em;border-radius:4px}
+pre{background:var(--papel);border:1px solid var(--linea);border-radius:8px;padding:1rem;overflow-x:auto;
+font-size:.86rem;line-height:1.5}
+pre code{background:none;padding:0}
+blockquote{margin:1.5rem 0;padding:.25rem 0 .25rem 1.1rem;border-left:3px solid var(--acento);color:var(--tenue)}
+table{border-collapse:collapse;width:100%;margin:1.5rem 0;font-size:.93rem}
+th,td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--linea)}
+th{color:var(--tenue);font-weight:600;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
+hr{border:0;border-top:1px solid var(--linea);margin:3rem 0}
+ul.lista{list-style:none;padding:0}
+ul.lista li{padding:.9rem 0;border-bottom:1px solid var(--linea)}
+ul.lista .fecha{color:var(--tenue);font-family:var(--mono);font-size:.82rem}
+footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);color:var(--tenue);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<header class="casa">
+<p class="marca">El Taller</p>
+<p class="lema">Medidas, pruebas y lo que se rompe.</p>
+</header>
+<p>Todas las cifras de aquí salen de un banco de pruebas que se puede repetir. Si algo no se pudo medir, se dice.
+Si un número salió mal, se corrige y se explica.</p>
+<ul class="lista">
+<li><span class="fecha">2026-11-17</span><br><a href="01-ollama-truncado-silencioso.html">Ollama trunca tu documento en silencio, y el modelo te dice que lo ha leído entero</a><p class="resumen">Le pasamos 300.000 y 600.000 caracteres. En los dos casos leyó 65.538 tokens. Y contestó como si hubiera leído todo.</p></li>
+<li><span class="fecha">2026-11-17</span><br><a href="02-razonamiento-apagado.html">Apagar el razonamiento cuesta 12 aciertos, no te hace más rápido, y nadie te avisa</a><p class="resumen">El mismo modelo, el mismo banco, la misma máquina. Con razonamiento 45/48. Sin razonamiento 33/48. Y encima más lento.</p></li>
+</ul>
+<footer>
+<p>Texto bajo <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a>.</p>
+</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ollama trunca tu documento en silencio, y el modelo te dice que lo ha leído entero · El Taller</title>
+<meta name="description" content="Le pasamos 300.000 y 600.000 caracteres. En los dos casos leyó 65.538 tokens. Y contestó como si hubiera leído todo.">
+<style>:root{--fondo:#111418;--papel:#171b21;--tinta:#e6e9ee;--tenue:#98a2b3;--acento:#e0a458;--linea:#2a313b;
+--mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+--texto:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+@media(prefers-color-scheme:light){:root{--fondo:#fbfaf7;--papel:#fff;--tinta:#1b1f24;--tenue:#5b6672;
+--acento:#a5641a;--linea:#e3ded4}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:17px/1.65 var(--texto);
+-webkit-font-smoothing:antialiased}
+main{max-width:43rem;margin:0 auto;padding:3rem 1.25rem 6rem}
+a{color:var(--acento);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--acento)}
+header.casa{border-bottom:1px solid var(--linea);padding-bottom:1.5rem;margin-bottom:2.5rem}
+header.casa .marca{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin:0}
+header.casa .lema{color:var(--tenue);font-size:.95rem;margin:.35rem 0 0}
+h1{font-size:1.85rem;line-height:1.25;letter-spacing:-.02em;margin:0 0 .6rem}
+h2{font-size:1.25rem;margin:2.5rem 0 .75rem;letter-spacing:-.01em}
+h3{font-size:1.05rem;margin:1.75rem 0 .5rem}
+.meta{color:var(--tenue);font-size:.9rem;margin-bottom:2rem;font-family:var(--mono)}
+.resumen{color:var(--tenue);margin:.4rem 0 0}
+code{font-family:var(--mono);font-size:.9em;background:var(--papel);padding:.15em .4em;border-radius:4px}
+pre{background:var(--papel);border:1px solid var(--linea);border-radius:8px;padding:1rem;overflow-x:auto;
+font-size:.86rem;line-height:1.5}
+pre code{background:none;padding:0}
+blockquote{margin:1.5rem 0;padding:.25rem 0 .25rem 1.1rem;border-left:3px solid var(--acento);color:var(--tenue)}
+table{border-collapse:collapse;width:100%;margin:1.5rem 0;font-size:.93rem}
+th,td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--linea)}
+th{color:var(--tenue);font-weight:600;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
+hr{border:0;border-top:1px solid var(--linea);margin:3rem 0}
+ul.lista{list-style:none;padding:0}
+ul.lista li{padding:.9rem 0;border-bottom:1px solid var(--linea)}
+ul.lista .fecha{color:var(--tenue);font-family:var(--mono);font-size:.82rem}
+footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);color:var(--tenue);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<header class="casa">
+<p class="marca"><a href="index.html">El Taller</a></p>
+<p class="lema">Medidas, pruebas y lo que se rompe.</p>
+</header>
+<article>
+<h1>Ollama trunca tu documento en silencio, y el modelo te dice que lo ha leído entero</h1>
+<p class="meta">2026-11-17</p>
+<p>Voy a empezar por lo que más duele, porque el truncado no es la parte grave.</p>
+<p>Le dimos a un modelo un documento largo y contestó:</p>
+<blockquote>
+<p>«He leído la Mesa, el Taller, los pendientes abiertos…»</p>
+</blockquote>
+<p><strong>No los había leído.</strong> El servidor le había entregado menos de la mitad del texto y no se lo dijo a nadie. Ni a él ni a mí.</p>
+<h2>Qué medí</h2>
+<p>La misma petición, el mismo prompt, dos servidores distintos. Cada vez cambiaba solo el tamaño del documento:</p>
+<table>
+<thead>
+<tr>
+<th>lo que envié</th>
+<th>Ollama leyó</th>
+<th>llama.cpp leyó</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>300.000 caracteres</td>
+<td><strong>65.538 tokens</strong></td>
+<td>112.627 tokens</td>
+</tr>
+<tr>
+<td>600.000 caracteres</td>
+<td><strong>65.538 tokens</strong></td>
+<td>129.375 tokens</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mira la primera columna otra vez.</strong> Doblé el documento y el número no se movió: <strong>65.538</strong>. No es que leyera menos de lo que le di; es que <strong>lee siempre lo mismo, y el resto lo tira</strong>.</p>
+<p>En la segunda columna el número sí crece con el documento. Es la misma máquina, las dos tarjetas, el mismo modelo. La diferencia es el servidor.</p>
+<h2>Por qué esto es peor que un truncado normal</h2>
+<p>Un truncado honesto te devuelve un error, o te avisa, o te dice &ldquo;no me cabe&rdquo;. Eso lo puedes manejar.</p>
+<p><strong>Esto no.</strong> La petición termina con <code>200 OK</code>, el modelo responde con seguridad y <strong>nadie en la cadena sabe que falta la mitad del texto</strong>. Si le preguntas por el final del documento, <strong>te lo va a inventar con la misma cara que si lo hubiera leído</strong>, porque para él no existe la parte que no le llegó.</p>
+<p>No es que el modelo alucine. <strong>Es que le han mentido primero a él.</strong></p>
+<h2>Lo que NO sé, y lo digo</h2>
+<p><strong>No he determinado la causa.</strong> El tope era exactamente 65.536 tokens (64 × 1024), y el servidor entregaba 65.538 entre cabeceras y plantilla. Eso apunta a un límite de contexto del servidor — pero <strong>no he aislado si viene del valor por defecto de <code>num_ctx</code>, de una variable de entorno, o de un tope duro del propio servidor</strong>.</p>
+<p><strong>Lo que sí está medido, y es lo que importa:</strong> con dos tamaños de entrada muy distintos, la salida del servidor fue <strong>el mismo número de tokens</strong>. Eso no es un modelo que se queda corto; es un servidor que recorta.</p>
+<h2>Qué hago mientras tanto</h2>
+<ol>
+<li><strong>Si el documento es largo, no uses el atajo.</strong> Comprueba el número de tokens que llegan de verdad antes de creerte una respuesta.</li>
+<li><strong>Pídelo explícito.</strong> Si el servidor acepta un tamaño de contexto, ponlo tú, y aun así <strong>mídelo</strong>: pedirlo no garantiza obtenerlo.</li>
+<li><strong>Para documentos de verdad largos, un servidor que no recorte.</strong> En mi caso, el mismo modelo por <code>llama.cpp</code> leyó 112.627 y 129.375 tokens de los mismos textos.</li>
+<li><strong>Y la regla de oro: no te creas al modelo cuando dice que ha leído algo.</strong> Que lo diga no es una prueba. Es una frase.</li>
+</ol>
+<h2>Cómo lo puedes repetir</h2>
+<p>Es un experimento de dos minutos. Genera dos documentos de tamaño muy distinto, mándalos con la misma pregunta, y <strong>mira los tokens de entrada que el servidor dice haber usado</strong> (no los que crees haber enviado):</p>
+<pre><code class="language-python">import json, urllib.request
+
+def tokens_de_entrada(url, modelo, texto):
+    cuerpo = json.dumps({
+        &quot;model&quot;: modelo,
+        &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: texto + &quot;\n\nResponde solo: OK&quot;}],
+        &quot;stream&quot;: False,
+    }).encode()
+    peticion = urllib.request.Request(
+        url + &quot;/v1/chat/completions&quot;, cuerpo,
+        {&quot;Content-Type&quot;: &quot;application/json&quot;})
+    with urllib.request.urlopen(peticion, timeout=300) as r:
+        datos = json.load(r)
+    return datos[&quot;usage&quot;][&quot;prompt_tokens&quot;]
+
+corto  = &quot;palabra &quot; * 40_000     # ~300.000 caracteres
+largo  = &quot;palabra &quot; * 80_000     # ~600.000 caracteres
+
+for nombre, texto, base in ((&quot;ollama&quot;, corto, &quot;http://127.0.0.1:11434&quot;),
+                            (&quot;ollama&quot;, largo, &quot;http://127.0.0.1:11434&quot;),
+                            (&quot;llama.cpp&quot;, corto, &quot;http://127.0.0.1:8099&quot;),
+                            (&quot;llama.cpp&quot;, largo, &quot;http://127.0.0.1:8099&quot;)):
+    print(nombre, len(texto), &quot;caracteres →&quot;,
+          tokens_de_entrada(base, &quot;tu-modelo&quot;, texto), &quot;tokens&quot;)
+</code></pre>
+<p>Si los dos números de un servidor son <strong>el mismo</strong>, ese servidor te está recortando. Y ahora ya sabes por qué el modelo te contestaba tan seguro.</p>
+<hr />
+<p><strong>Nota de método.</strong> Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha. La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. El mismo modelo en los dos servidores. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.</p>
+</article>
+<footer>
+<p>Todo lo que hay aquí se ha medido en una máquina concreta y se puede repetir. Cuando no se pudo medir,
+se dice. Los números llevan su fecha y su comando.</p>
+<p>Texto bajo <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a>.</p>
+</footer>
+</main>
+</body>
+</html>
