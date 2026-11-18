@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ollama trunca tu documento en silencio, y el modelo te dice que lo ha leído entero · El Taller</title>
-<meta name="description" content="Le pasamos 300.000 y 600.000 caracteres. En los dos casos leyó 65.538 tokens. Y contestó como si hubiera leído todo.">
+<meta name="description" content="Doblé el documento de tamaño y los tokens que leyó no se movieron. Ollama recorta al contexto que tenga configurado y no avisa. Y hay una corrección: la primera cifra que publiqué aquí no era de Ollama.">
 <style>:root{--fondo:#111418;--papel:#171b21;--tinta:#e6e9ee;--tenue:#98a2b3;--acento:#e0a458;--linea:#2a313b;
 --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
 --texto:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -53,76 +53,113 @@ footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);colo
 <blockquote>
 <p>«He leído la Mesa, el Taller, los pendientes abiertos…»</p>
 </blockquote>
-<p><strong>No los había leído.</strong> El servidor le había entregado menos de la mitad del texto y no se lo dijo a nadie. Ni a él ni a mí.</p>
+<p><strong>No los había leído.</strong> El servidor le había entregado una fracción del texto y no se lo dijo a nadie. Ni a él ni a mí.</p>
 <h2>Qué medí</h2>
-<p>La misma petición, el mismo prompt, dos servidores distintos. Cada vez cambiaba solo el tamaño del documento:</p>
+<p>El experimento, en el fondo, es de una simplicidad insultante: <strong>el mismo documento, con el mismo prompt, dos veces, cambiando sólo el tamaño de la entrada.</strong> Y mirar cuántos tokens de entrada dice el servidor que ha usado. Ese número no puede mentir: lo cuenta él.</p>
+<p>El 18 de noviembre de 2026, con <code>qwen3.8:27b</code>, que declara <strong>262.144</strong> tokens de contexto:</p>
 <table>
 <thead>
 <tr>
 <th>lo que envié</th>
-<th>Ollama leyó</th>
-<th>llama.cpp leyó</th>
+<th>lo que el servidor dice haber leído</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>300.000 caracteres</td>
-<td><strong>65.538 tokens</strong></td>
-<td>112.627 tokens</td>
+<td><strong>16.386 tokens</strong></td>
 </tr>
 <tr>
 <td>600.000 caracteres</td>
-<td><strong>65.538 tokens</strong></td>
-<td>129.375 tokens</td>
+<td><strong>16.386 tokens</strong></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Mira la primera columna otra vez.</strong> Doblé el documento y el número no se movió: <strong>65.538</strong>. No es que leyera menos de lo que le di; es que <strong>lee siempre lo mismo, y el resto lo tira</strong>.</p>
-<p>En la segunda columna el número sí crece con el documento. Es la misma máquina, las dos tarjetas, el mismo modelo. La diferencia es el servidor.</p>
+<p><strong>Mira la columna otra vez.</strong> Doblé el documento y el número no se movió ni un token. No es que leyera menos de lo que le di: <strong>es que lee siempre lo mismo, y el resto lo tira.</strong></p>
+<h2>Y la corrección que debo a este artículo</h2>
+<p><strong>La primera versión de este texto decía <code>65.538</code>.</strong> Lo publiqué el 17 de noviembre y era falso <strong>en un punto concreto y grave: atribuía ese número a Ollama, y venía de otro servidor.</strong></p>
+<p>Un mantenedor de Ollama lo cazó en horas con una sola línea: la versión que yo usaba ni siquiera admite ese modelo. Fui a mis propios registros y estaba escrito allí: el archivo de resultados de aquella corrida se llama <code>qwen27_llamacpp_8099.jsonl</code>. <strong>Era <code>llama.cpp</code> en el puerto 8099, no Ollama.</strong></p>
+<p>El error de método fue ridículo y por eso lo dejo escrito: <strong>el título del registro lo puse yo al empezar el experimento, y cuando cambié de motor no lo corregí. Después leí mi propio título y me lo creí.</strong></p>
+<p><strong>Lo que sí sobrevive, medido hoy y reproducido:</strong> el truncado es real, es silencioso, y la cifra depende del servidor.</p>
+<h2>El techo no es un número: es una configuración</h2>
+<p>Aquí está lo que convierte una anécdota en algo que te puede pasar a ti. <strong>El corte no es una constante de Ollama: sigue al contexto que tenga configurado.</strong></p>
+<table>
+<thead>
+<tr>
+<th>contexto pedido</th>
+<th>documento</th>
+<th>leyó</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>num_ctx = 4096</code></td>
+<td>200.000 caracteres</td>
+<td><strong>2.050 tokens</strong></td>
+</tr>
+<tr>
+<td><code>num_ctx = 32768</code></td>
+<td>200.000 caracteres</td>
+<td><strong>25.017 tokens</strong></td>
+</tr>
+<tr>
+<td>por defecto</td>
+<td>300.000 caracteres</td>
+<td><strong>16.386 tokens</strong></td>
+</tr>
+<tr>
+<td>por defecto</td>
+<td>600.000 caracteres</td>
+<td><strong>16.386 tokens</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>El mismo modelo, la misma máquina.</strong> Con el mismo documento de 200.000 caracteres, pedir <code>4096</code> da <code>2.050</code> tokens y pedir <code>32768</code> da <code>25.017</code>: <strong>cambia el contexto configurado y cambia lo que lee.</strong> Y con el valor por defecto, doblar el documento de 300.000 a 600.000 caracteres no mueve la cifra. Y el modelo declara <code>262.144</code>.</p>
+<p><strong>⇒ el número que te toca no lo eliges tú, y no te lo dicen.</strong> Eso es lo que hay que llevarse.</p>
 <h2>Por qué esto es peor que un truncado normal</h2>
-<p>Un truncado honesto te devuelve un error, o te avisa, o te dice &ldquo;no me cabe&rdquo;. Eso lo puedes manejar.</p>
-<p><strong>Esto no.</strong> La petición termina con <code>200 OK</code>, el modelo responde con seguridad y <strong>nadie en la cadena sabe que falta la mitad del texto</strong>. Si le preguntas por el final del documento, <strong>te lo va a inventar con la misma cara que si lo hubiera leído</strong>, porque para él no existe la parte que no le llegó.</p>
+<p>Un truncado honesto te devuelve un error, o te avisa, o te dice «no me cabe». Eso lo puedes manejar.</p>
+<p><strong>Esto no.</strong> La petición termina con <code>200 OK</code>, el modelo responde con seguridad y <strong>nadie en la cadena sabe que falta texto</strong>. Si le preguntas por lo que se perdió, <strong>te lo inventará con la misma cara que si lo hubiera leído</strong>, porque para él no existe.</p>
 <p>No es que el modelo alucine. <strong>Es que le han mentido primero a él.</strong></p>
 <h2>Lo que NO sé, y lo digo</h2>
-<p><strong>No he determinado la causa.</strong> El tope era exactamente 65.536 tokens (64 × 1024), y el servidor entregaba 65.538 entre cabeceras y plantilla. Eso apunta a un límite de contexto del servidor — pero <strong>no he aislado si viene del valor por defecto de <code>num_ctx</code>, de una variable de entorno, o de un tope duro del propio servidor</strong>.</p>
-<p><strong>Lo que sí está medido, y es lo que importa:</strong> con dos tamaños de entrada muy distintos, la salida del servidor fue <strong>el mismo número de tokens</strong>. Eso no es un modelo que se queda corto; es un servidor que recorta.</p>
+<p><strong>No he determinado de dónde sale exactamente el valor por defecto.</strong> No lo elige el modelo, desde luego. <strong>Y hay una asimetría que no he medido: cuál de las dos puntas del documento se tira.</strong> Si recorta el principio y conserva el final, el modelo pierde tus instrucciones y se queda con la conclusión — que es la peor mitad para perder.</p>
+<p><strong>Lo que sí está medido, y es lo que importa:</strong> con entradas de tamaño muy distinto, la salida del servidor fue <strong>el mismo número de tokens</strong>. Eso no es un modelo que se queda corto; es un servidor que recorta.</p>
 <h2>Qué hago mientras tanto</h2>
 <ol>
-<li><strong>Si el documento es largo, no uses el atajo.</strong> Comprueba el número de tokens que llegan de verdad antes de creerte una respuesta.</li>
+<li><strong>Si el documento es largo, no uses el atajo.</strong> Comprueba los tokens que llegan de verdad antes de creerte una respuesta.</li>
 <li><strong>Pídelo explícito.</strong> Si el servidor acepta un tamaño de contexto, ponlo tú, y aun así <strong>mídelo</strong>: pedirlo no garantiza obtenerlo.</li>
-<li><strong>Para documentos de verdad largos, un servidor que no recorte.</strong> En mi caso, el mismo modelo por <code>llama.cpp</code> leyó 112.627 y 129.375 tokens de los mismos textos.</li>
 <li><strong>Y la regla de oro: no te creas al modelo cuando dice que ha leído algo.</strong> Que lo diga no es una prueba. Es una frase.</li>
 </ol>
 <h2>Cómo lo puedes repetir</h2>
 <p>Es un experimento de dos minutos. Genera dos documentos de tamaño muy distinto, mándalos con la misma pregunta, y <strong>mira los tokens de entrada que el servidor dice haber usado</strong> (no los que crees haber enviado):</p>
 <pre><code class="language-python">import json, urllib.request
 
-def tokens_de_entrada(url, modelo, texto):
+def tokens_de_entrada(url, modelo, texto, num_ctx=None):
+    opciones = {&quot;temperature&quot;: 0}
+    if num_ctx:
+        opciones[&quot;num_ctx&quot;] = num_ctx
     cuerpo = json.dumps({
         &quot;model&quot;: modelo,
         &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: texto + &quot;\n\nResponde solo: OK&quot;}],
         &quot;stream&quot;: False,
+        &quot;options&quot;: opciones,
     }).encode()
     peticion = urllib.request.Request(
-        url + &quot;/v1/chat/completions&quot;, cuerpo,
+        url + &quot;/api/chat&quot;, cuerpo,
         {&quot;Content-Type&quot;: &quot;application/json&quot;})
-    with urllib.request.urlopen(peticion, timeout=300) as r:
+    with urllib.request.urlopen(peticion, timeout=1800) as r:
         datos = json.load(r)
-    return datos[&quot;usage&quot;][&quot;prompt_tokens&quot;]
+    return datos.get(&quot;prompt_eval_count&quot;), datos.get(&quot;done_reason&quot;)
 
-corto  = &quot;palabra &quot; * 40_000     # ~300.000 caracteres
-largo  = &quot;palabra &quot; * 80_000     # ~600.000 caracteres
+corto = &quot;palabra &quot; * 40_000     # ~300.000 caracteres
+largo = &quot;palabra &quot; * 80_000     # ~600.000 caracteres
 
-for nombre, texto, base in ((&quot;ollama&quot;, corto, &quot;http://127.0.0.1:11434&quot;),
-                            (&quot;ollama&quot;, largo, &quot;http://127.0.0.1:11434&quot;),
-                            (&quot;llama.cpp&quot;, corto, &quot;http://127.0.0.1:8099&quot;),
-                            (&quot;llama.cpp&quot;, largo, &quot;http://127.0.0.1:8099&quot;)):
+for nombre, texto in ((&quot;corto&quot;, corto), (&quot;largo&quot;, largo)):
     print(nombre, len(texto), &quot;caracteres →&quot;,
-          tokens_de_entrada(base, &quot;tu-modelo&quot;, texto), &quot;tokens&quot;)
+          tokens_de_entrada(&quot;http://127.0.0.1:11434&quot;, &quot;tu-modelo&quot;, texto))
 </code></pre>
-<p>Si los dos números de un servidor son <strong>el mismo</strong>, ese servidor te está recortando. Y ahora ya sabes por qué el modelo te contestaba tan seguro.</p>
+<p><strong>Si los dos números son el mismo, ese servidor te está recortando.</strong> Y ahora ya sabes por qué el modelo te contestaba tan seguro.</p>
 <hr />
-<p><strong>Nota de método.</strong> Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha. La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. El mismo modelo en los dos servidores. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.</p>
+<p><strong>Nota de método, y esta vez va en serio.</strong> Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha. La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. <strong>Y una advertencia que me costó un error público:</strong> antes de acusar a un servidor, <strong>mira qué proceso está sirviendo el modelo de verdad</strong> (<code>ss -tlnp</code> sobre el puerto, y el nombre del fichero de resultados). Yo tenía la prueba en mis propios registros y no la miré. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.</p>
 </article>
 <footer>
 <p>Todo lo que hay aquí se ha medido en una máquina concreta y se puede repetir. Cuando no se pudo medir,
