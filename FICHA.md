@@ -26,14 +26,27 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
                               commit → push a main → GitHub Pages → taller.dantehef.dev
 ```
 
-**⇒ LA REGLA DE PEDRO, y es la que manda aquí:** ***«toda publicación hay que verificarla en casa antes de publicar»*** **⇒ no se empuja nada que no haya pasado `salud.sh` en local primero. Y después de publicar, se verifica EN VIVO por otro camino (sha256 del fichero servido contra el fichero local), no por lo que diga GitHub.**
+**⇒ LAS DOS REGLAS DE PEDRO, y mandan las dos:**
+
+1. ***«toda publicación hay que verificarla en casa antes de publicar»*** ⇒ no sale nada que no haya pasado `salud.sh` primero, y después de publicar se verifica **EN VIVO** por otro camino (sha256 de lo servido contra lo local), no por lo que diga GitHub.
+2. ***«nada se publica sin que el otro cuerpo y yo lo veamos antes: en tu web y en GitHub»*** *(19-11-2026)* ⇒ **`main` no se toca sin las dos miradas.** La ceremonia tiene **dos tiempos y no hay un tercero:**
+
+```
+bash publica.sh propone "mensaje"   ← rama + PR + vista previa en 127.0.0.1:8097. NO publica.
+        ↓  (miran 🔨 Hefesto y 👑 Pedro: en la vista previa y en el PR)
+bash publica.sh cierra <PR> --visto "Hefesto (...) + Pedro (...)"
+                                    ← fusiona, apaga la previa, y exige que el dominio sirva lo local
+```
+
+**Y el límite de esa ceremonia, escrito aquí y no escondido:** el guion **no puede comprobar que hayan mirado**; lo que hace es **negarse a publicar sin que alguien escriba el `--visto`**, y dejarlo grabado en el mensaje de la fusión y en el registro. La firma la pone una mano; el guion sólo se niega a saltársela.
 
 ## ③ LAS TRES PIEZAS QUE LO MANTIENEN
 
 | pieza | qué hace | cuándo |
 |---|---|---|
 | `salud.sh` | 8 comprobaciones: repo limpio y empujado · el `sitio/` corresponde a los `.md` (reconstruye en copia y compara byte a byte) · cada HTML con su `canonical`/`og`/JSON-LD · **cada página EN VIVO byte a byte igual a la local** · `sitemap.xml` con tantas URL como páginas · `robots.txt` · el espejo con `noindex` · días de certificado TLS | a mano, y antes de publicar (`--solo-local`) |
-| `publica.sh "mensaje"` | construye · pasa `salud.sh --solo-local` · commit · push · **espera a que el dominio sirva exactamente lo local** · dice qué hacer si no | cada vez que hay algo nuevo |
+| `publica.sh propone` | construye · verifica en casa · **rama + PR (main intacto)** · levanta la vista previa en `127.0.0.1:8097` | cuando hay algo que enseñar |
+| `publica.sh cierra` | **fusiona con las dos miradas** (`--visto`) · apaga la previa · **espera a que el dominio sirva exactamente lo local** | cuando Hefesto y Pedro han dicho que sí |
 | `respaldo.sh` | `git bundle` verificado (`git bundle verify`) a `~/.imperio/backups/taller_web/`, guarda los 6 últimos, y comprueba que el remoto tiene todo | cada semana y antes de un cambio gordo |
 
 **Registro de todo:** `~/.imperio/logs/taller_web.log`.
