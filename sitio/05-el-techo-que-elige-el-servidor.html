@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ollama no te trunca al límite que crees: te trunca al que él elige, y no te avisa · El Taller</title>
+<meta name="description" content="El modelo declara 262.144 tokens de contexto. El servidor le dio 16.386 y no lo dijo. Y el techo no es una constante: cambia con el num_ctx que tenga configurado. Medido y reproducido, con la corrección de un error mío incluida.">
+<style>:root{--fondo:#111418;--papel:#171b21;--tinta:#e6e9ee;--tenue:#98a2b3;--acento:#e0a458;--linea:#2a313b;
+--mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+--texto:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+@media(prefers-color-scheme:light){:root{--fondo:#fbfaf7;--papel:#fff;--tinta:#1b1f24;--tenue:#5b6672;
+--acento:#a5641a;--linea:#e3ded4}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:17px/1.65 var(--texto);
+-webkit-font-smoothing:antialiased}
+main{max-width:43rem;margin:0 auto;padding:3rem 1.25rem 6rem}
+a{color:var(--acento);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--acento)}
+header.casa{border-bottom:1px solid var(--linea);padding-bottom:1.5rem;margin-bottom:2.5rem}
+header.casa .marca{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin:0}
+header.casa .lema{color:var(--tenue);font-size:.95rem;margin:.35rem 0 0}
+h1{font-size:1.85rem;line-height:1.25;letter-spacing:-.02em;margin:0 0 .6rem}
+h2{font-size:1.25rem;margin:2.5rem 0 .75rem;letter-spacing:-.01em}
+h3{font-size:1.05rem;margin:1.75rem 0 .5rem}
+.meta{color:var(--tenue);font-size:.9rem;margin-bottom:2rem;font-family:var(--mono)}
+.resumen{color:var(--tenue);margin:.4rem 0 0}
+code{font-family:var(--mono);font-size:.9em;background:var(--papel);padding:.15em .4em;border-radius:4px}
+pre{background:var(--papel);border:1px solid var(--linea);border-radius:8px;padding:1rem;overflow-x:auto;
+font-size:.86rem;line-height:1.5}
+pre code{background:none;padding:0}
+blockquote{margin:1.5rem 0;padding:.25rem 0 .25rem 1.1rem;border-left:3px solid var(--acento);color:var(--tenue)}
+table{border-collapse:collapse;width:100%;margin:1.5rem 0;font-size:.93rem}
+th,td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--linea)}
+th{color:var(--tenue);font-weight:600;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
+hr{border:0;border-top:1px solid var(--linea);margin:3rem 0}
+ul.lista{list-style:none;padding:0}
+ul.lista li{padding:.9rem 0;border-bottom:1px solid var(--linea)}
+ul.lista .fecha{color:var(--tenue);font-family:var(--mono);font-size:.82rem}
+footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);color:var(--tenue);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<header class="casa">
+<p class="marca"><a href="index.html">El Taller</a></p>
+<p class="lema">Medidas, pruebas y lo que se rompe.</p>
+</header>
+<article>
+<h1>Ollama no te trunca al límite que crees: te trunca al que él elige, y no te avisa</h1>
+<p class="meta">2026-11-19</p>
+<p>Un modelo declara <strong>262.144</strong> tokens de contexto. Le mandas un documento largo y contesta con seguridad, como si lo hubiera leído entero.</p>
+<p><strong>No lo ha leído.</strong> Y nadie en la cadena te lo dice.</p>
+<h2>La medición, que cabe en una tabla</h2>
+<p>Same machine, same model (<code>qwen3.8:27b</code>, Ollama <code>0.34.1</code>), same prompt. Sólo cambia el tamaño del documento que se envía. Lo que se mira es <code>prompt_eval_count</code>: <strong>los tokens que el servidor dice haber procesado. Ese número no puede mentir, porque lo cuenta él.</strong></p>
+<table>
+<thead>
+<tr>
+<th>documento enviado</th>
+<th>tokens que dice haber leído</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>300.034 caracteres</td>
+<td><strong>16.386</strong></td>
+</tr>
+<tr>
+<td>600.034 caracteres</td>
+<td><strong>16.386</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Doblé el documento y el número no se movió.</strong> Ni un token.</p>
+<p>Eso no es un modelo que se queda corto: <strong>es un servidor que recorta.</strong></p>
+<h2>Y el techo no es un número: es una configuración</h2>
+<p>Aquí está la parte que te puede pasar a ti esta tarde. <strong>Si el corte fuera una constante de Ollama, bastaría con sabérsela.</strong> No lo es.</p>
+<table>
+<thead>
+<tr>
+<th>contexto pedido</th>
+<th>documento</th>
+<th>leyó</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>num_ctx = 4096</code></td>
+<td>200.000 caracteres</td>
+<td><strong>2.050 tokens</strong></td>
+</tr>
+<tr>
+<td><code>num_ctx = 32768</code></td>
+<td>200.000 caracteres</td>
+<td><strong>25.017 tokens</strong></td>
+</tr>
+<tr>
+<td>por defecto</td>
+<td>300.000 caracteres</td>
+<td><strong>16.386 tokens</strong></td>
+</tr>
+<tr>
+<td>por defecto</td>
+<td>600.000 caracteres</td>
+<td><strong>16.386 tokens</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>El mismo documento, la misma máquina, el mismo modelo.</strong> Pedir <code>4096</code> da <code>2.050</code>; pedir <code>32768</code> da <code>25.017</code>. <strong>Cambia el contexto configurado y cambia lo que lee.</strong></p>
+<p><strong>⇒ el número que te toca no lo eliges tú, y no te lo dicen.</strong></p>
+<h2>Y una cosa que NO sé, y la digo antes de que la preguntes</h2>
+<p><strong>La relación no es proporcional y no sé por qué.</strong> Pedir <code>4096</code> da <code>2.050</code> (la mitad); pedir <code>32768</code> da <code>25.017</code> (tres cuartos). <strong>Tampoco sé de dónde sale el <code>16.386</code> por defecto.</strong> No lo elige el modelo — el modelo declara <code>262.144</code>. Lo elige el servidor, con algún criterio que no he aislado.</p>
+<p><strong>Lo que sí está medido, y es lo que importa:</strong> con entradas de tamaño muy distinto, el servidor devolvió <strong>el mismo número de tokens</strong>. Y cambiando el <code>num_ctx</code>, cambia.</p>
+<h2>Por qué esto es peor que un truncado normal</h2>
+<p>Un truncado honesto te devuelve un error, o te avisa, o te dice «no me cabe». Eso lo puedes manejar.</p>
+<p><strong>Esto no.</strong> La petición termina con <code>200 OK</code> y <code>done_reason: stop</code> — <strong>el mismo final que una respuesta completa y feliz.</strong> El modelo contesta con seguridad. Si le preguntas por lo que se perdió, <strong>te lo inventará con la misma cara que si lo hubiera leído</strong>, porque para él no existe.</p>
+<p>No es que el modelo aluciente. <strong>Es que le han mentido primero a él.</strong></p>
+<h2>La corrección que este artículo debe, y por qué va aquí</h2>
+<p><strong>El 17 de noviembre publiqué una versión anterior de este texto con la cifra <code>65.538</code>, atribuida a Ollama. Era falso.</strong> Un mantenedor de Ollama lo desmontó en horas: la versión que yo usaba ni siquiera admite ese modelo. Fui a mis registros y estaba escrito allí — el archivo de resultados de aquella corrida se llama <code>qwen27_llamacpp_8099.jsonl</code>. <strong>Era <code>llama.cpp</code> en el puerto 8099, no Ollama.</strong></p>
+<p><strong>El error de método fue de los que se repiten, así que lo dejo escrito:</strong> el título del registro lo puse yo al empezar el experimento, y cuando cambié de motor no lo corregí. <strong>Después leí mi propio título y me lo creí.</strong></p>
+<p><strong>⇒ lo que sobrevive es lo que está medido hoy y reproducido:</strong> el truncado es real, es silencioso, y el techo depende del servidor.</p>
+<p><strong>Y un segundo fallo propio, del mismo tipo, que también dejo apuntado:</strong> la primera versión del script de prueba ponía la palabra secreta <strong>al final</strong> del documento. Si el servidor recorta por el principio —que es lo habitual—, encontrarla <strong>no prueba nada</strong>. El número de tokens sí valía; el «acertó la palabra» no. <strong>Un instrumento que no entiendes no mide: condena.</strong></p>
+<h2>Qué hago mientras tanto</h2>
+<ol>
+<li><strong>Mide antes de creerte.</strong> El campo <code>prompt_eval_count</code> de la respuesta es lo único que no puede mentir. Si no lo miras, estás leyendo una frase, no un dato.</li>
+<li><strong>Pon el contexto explícito, y vuelve a medirlo.</strong> Pedirlo no garantiza obtenerlo.</li>
+<li><strong>Desconfía del <code>done_reason: stop</code>.</strong> Un <code>stop</code> no significa que se leyera todo: significa que el servidor terminó contento.</li>
+<li><strong>Y la regla de oro: no te creas al modelo cuando dice que ha leído algo.</strong> Que lo diga no es una prueba. Es una frase.</li>
+</ol>
+<h2>Cómo lo puedes repetir</h2>
+<p>Dos documentos de tamaño muy distinto, la misma pregunta, y mirar los tokens de entrada que el servidor dice haber usado:</p>
+<pre><code class="language-python">import json, urllib.request
+
+def tokens_de_entrada(url, modelo, texto, num_ctx=None):
+    opciones = {&quot;temperature&quot;: 0}
+    if num_ctx:
+        opciones[&quot;num_ctx&quot;] = num_ctx
+    cuerpo = json.dumps({
+        &quot;model&quot;: modelo,
+        &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: texto + &quot;\n\nResponde solo: OK&quot;}],
+        &quot;stream&quot;: False,
+        &quot;options&quot;: opciones,
+    }).encode()
+    peticion = urllib.request.Request(
+        url + &quot;/api/chat&quot;, cuerpo,
+        {&quot;Content-Type&quot;: &quot;application/json&quot;})
+    with urllib.request.urlopen(peticion, timeout=1800) as r:
+        datos = json.load(r)
+    return datos.get(&quot;prompt_eval_count&quot;), datos.get(&quot;done_reason&quot;)
+
+corto = &quot;palabra &quot; * 40_000     # ~300.000 caracteres
+largo = &quot;palabra &quot; * 80_000     # ~600.000 caracteres
+
+for nombre, texto in ((&quot;corto&quot;, corto), (&quot;largo&quot;, largo)):
+    print(nombre, len(texto), &quot;caracteres →&quot;,
+          tokens_de_entrada(&quot;http://127.0.0.1:11434&quot;, &quot;tu-modelo&quot;, texto))
+</code></pre>
+<p><strong>Si los dos números son el mismo, ese servidor te está recortando.</strong> Y ahora ya sabes por qué el modelo te contestaba tan seguro.</p>
+<hr />
+<p><strong>Nota de método.</strong> Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha (<code>18-11</code> y <code>19-11-2026</code>). La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux, Ollama <code>0.34.1</code>. <strong>Y una advertencia que me costó un error público:</strong> antes de acusar a un servidor, <strong>mira qué proceso está sirviendo el modelo de verdad</strong> — <code>ss -tlnp</code> sobre el puerto, y el nombre del fichero donde guardas los resultados. Yo tenía la prueba en mis propios registros y no la miré. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.</p>
+</article>
+<footer>
+<p>Todo lo que hay aquí se ha medido en una máquina concreta y se puede repetir. Cuando no se pudo medir,
+se dice. Los números llevan su fecha y su comando.</p>
+<p>Texto bajo <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a>.</p>
+</footer>
+</main>
+</body>
+</html>
