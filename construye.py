@@ -15,6 +15,45 @@ ARTICULOS = os.path.join(AQUI, "articulos")
 SITIO = os.path.join(AQUI, "sitio")
 CSS = os.path.join(AQUI, "plantilla", "estilo.css")
 ENTRADA = os.path.join(AQUI, "plantilla", "entrada.html")
+BASE = "https://taller.dantehef.dev"
+
+# El sello de la pestaña del navegador: el mismo ET del encabezado, en SVG
+# (1 KB, sin fuentes, nítido en cualquier pantalla).
+FAVICON = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<rect width="32" height="32" rx="8" fill="#0a0a0a"/>
+<rect x="1.5" y="1.5" width="29" height="29" rx="7" fill="none" stroke="#00f2ff" stroke-width="1.2" opacity=".55"/>
+<text x="16" y="22" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="14"
+ font-weight="700" fill="#00f2ff" text-anchor="middle">ET</text>
+</svg>
+"""
+
+
+def cabeza(titulo, descripcion, ruta, imagen=True, tipo="website", fecha="", jsonld=""):
+    """Todo lo que le dice a un buscador qué es esta página y dónde está.
+
+    Sin esto Google puede indexar, pero nadie le ha dicho el nombre propio del
+    sitio ni cuál es la dirección buena: la canónica evita que el dominio y
+    github.io se peleen por la misma página.
+    """
+    import json
+    url = BASE + "/" + ruta
+    og_img = BASE + "/img/portada-ia.jpg"
+    etiquetas = [
+        '<link rel="canonical" href="%s">' % url,
+        '<meta name="theme-color" content="#0a0a0a">',
+        '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
+        '<meta property="og:site_name" content="El Taller">',
+        '<meta property="og:locale" content="es_ES">',
+        '<meta property="og:url" content="%s">' % url,
+        '<meta name="twitter:card" content="summary_large_image">',
+    ]
+    if imagen:
+        etiquetas += ['<meta property="og:image" content="%s">' % og_img,
+                      '<meta name="twitter:image" content="%s">' % og_img]
+    if jsonld:
+        etiquetas.append('<script type="application/ld+json">%s</script>'
+                         % json.dumps(jsonld, ensure_ascii=False))
+    return "\n".join(etiquetas)
 
 SELLO = """<svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0a458"/><stop offset="1" stop-color="#b45309"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#g)"/><path d="M8 22V10h3v9h5v3H8zm9 0V10h7v3h-4v9h-3z" fill="#fff"/></svg>"""
 
@@ -59,6 +98,7 @@ PLANTILLA = """<!doctype html>
 <meta property="og:title" content="{titulo}">
 <meta property="og:description" content="{resumen}">
 <meta property="og:type" content="article">
+{cabeza}
 <style>{css}</style>
 </head>
 <body>
@@ -85,6 +125,9 @@ PORTADA = """<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Temas · El Taller</title>
 <meta name="description" content="Medidas reales de modelos de lenguaje en hardware de casa.">
+<meta property="og:title" content="Temas · El Taller">
+<meta property="og:description" content="Medidas reales de modelos de lenguaje en hardware de casa.">
+{cabeza}
 <style>{css}</style>
 </head>
 <body>
@@ -181,8 +224,25 @@ def main():
         cuerpo_html = envuelve_tablas(
             markdown.markdown(e["cuerpo"], extensions=["tables", "fenced_code", "smarty"]))
 
+        jsonld = {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": limpia_titulo(e["titulo"]),
+            "description": e["resumen"],
+            "url": "%s/%s" % (BASE, e["nombre"]),
+            "mainEntityOfPage": "%s/%s" % (BASE, e["nombre"]),
+            "datePublished": e["fecha"],
+            "dateModified": e["fecha"],
+            "inLanguage": "es",
+            "image": "%s/img/portada-ia.jpg" % BASE,
+            "author": {"@type": "Person", "name": "Pedro", "url": BASE},
+            "publisher": {"@type": "Organization", "name": "El Taller", "url": BASE},
+            "keywords": e["tema"],
+        }
         pagina = PLANTILLA.format(
             titulo=html.escape(limpia_titulo(e["titulo"])),
+            cabeza=cabeza(limpia_titulo(e["titulo"]), e["resumen"], e["nombre"],
+                          tipo="article", fecha=e["fecha"], jsonld=jsonld),
             fecha=html.escape(e["fecha"]),
             resumen=html.escape(e["resumen"]),
             tema=html.escape(e["tema"]),
@@ -208,8 +268,22 @@ def main():
                    html.escape(e["fecha"]), e["minutos"])
         for i, e in enumerate(entradas))
 
+    jsonld_indice = {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "El Taller",
+        "url": BASE + "/temas.html",
+        "inLanguage": "es",
+        "description": "Pruebas de modelos de lenguaje sobre máquina casera. Datos públicos y contrastables.",
+        "blogPost": [{"@type": "BlogPosting", "headline": limpia_titulo(e["titulo"]),
+                      "url": "%s/%s" % (BASE, e["nombre"]), "datePublished": e["fecha"]}
+                     for e in entradas],
+    }
     with open(os.path.join(SITIO, "temas.html"), "w", encoding="utf-8") as f:
         f.write(PORTADA.format(css=css, lista=lista, cuantos=len(entradas),
+                               cabeza=cabeza("Temas", "Medidas reales de modelos de lenguaje "
+                                             "en hardware de casa.", "temas.html",
+                                             jsonld=jsonld_indice),
                                cabecera=CABECERA.format(sello=SELLO), pie=PIE,
                                chat=CHAT.format(cuantos=len(entradas))))
     print("  ✅ temas.html (%d artículos)" % len(entradas))
@@ -227,6 +301,28 @@ def main():
     with open(os.path.join(SITIO, "CNAME"), "w", encoding="utf-8") as f:
         f.write("taller.dantehef.dev\n")
     print("  ✅ CNAME (taller.dantehef.dev)")
+
+    # ── lo que un buscador necesita para encontrar y ordenar el sitio ──
+    with open(os.path.join(SITIO, "robots.txt"), "w", encoding="utf-8") as f:
+        f.write("User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % BASE)
+    print("  ✅ robots.txt")
+
+    hoy = max((e["fecha"] for e in entradas if e["fecha"]), default="")
+    urls = [("", hoy, "1.0", "weekly"), ("temas.html", hoy, "0.9", "weekly")]
+    urls += [(e["nombre"], e["fecha"], "0.8", "monthly") for e in entradas]
+    cuerpo_sitemap = "\n".join(
+        "  <url><loc>%s/%s</loc><lastmod>%s</lastmod>"
+        "<changefreq>%s</changefreq><priority>%s</priority></url>"
+        % (BASE, r, f, c, p) for r, f, p, c in urls if f)
+    with open(os.path.join(SITIO, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n'
+                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s\n</urlset>\n'
+                % cuerpo_sitemap)
+    print("  ✅ sitemap.xml (%d URLs)" % len(urls))
+
+    with open(os.path.join(SITIO, "favicon.svg"), "w", encoding="utf-8") as f:
+        f.write(FAVICON)
+    print("  ✅ favicon.svg")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<rect width="32" height="32" rx="8" fill="#0a0a0a"/>
+<rect x="1.5" y="1.5" width="29" height="29" rx="7" fill="none" stroke="#00f2ff" stroke-width="1.2" opacity=".55"/>
+<text x="16" y="22" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="14"
+ font-weight="700" fill="#00f2ff" text-anchor="middle">ET</text>
+</svg>
