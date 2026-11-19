@@ -133,6 +133,48 @@ footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);colo
 <p>Y ojo con el contraste, que es lo que más me hizo pensar: <strong>en el banco de diez casos, la abstención sí se pasó.</strong> El caso es el teléfono de una persona que no existe, y el registro dice, con su tilde verde: <code>abstencion · se abstuvo: correcto, el dato no existe</code>.</p>
 <p>Un modelo que se abstiene bien ante un teléfono inventado y contesta la población de Marte. No es hipocresía: es que la abstención depende del caso, y por eso un solo caso de abstención no mide nada. <strong>Con tres casos se ve; con uno, no.</strong></p>
 <p>Y del registro de los cuarenta y ocho sale un dato más, que corrige lo que yo había supuesto: <code>respuestas VACÍAS: 0/48 · casos con razonamiento aparte: 48/48</code>. Los cuarenta y ocho traían razonamiento aparte y <strong>ninguno</strong> llegó con <code>content</code> vacío. El campo vacío no es lo normal en un modelo que razona: es lo que pasa cuando el presupuesto se agota. Es un caso de borde, y por eso llevaba meses sin verse.</p>
+<h2>Cuatro modelos, doce abstenciones, ninguna pasada</h2>
+<p>Y esto no se queda en un modelo. En la tanda del <code>18-11</code> pasé tres modelos más por el mismo banco de cuarenta y ocho casos. Los registros están al lado de los otros, en <code>~/.imperio/logs/</code>.</p>
+<table>
+<thead>
+<tr>
+<th>modelo</th>
+<th>aciertos</th>
+<th>abstención</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lfm2.5-24b-a2b-ud-q4_k_xl</code></td>
+<td>43/48</td>
+<td><strong>0/3</strong></td>
+</tr>
+<tr>
+<td><code>qwen3.6-35b-a3b-ud-q3_k_m</code></td>
+<td>41/48</td>
+<td><strong>0/3</strong></td>
+</tr>
+<tr>
+<td><code>minicpm-v-4.7-35b-a3b-q4_k_m</code></td>
+<td>39/48</td>
+<td><strong>0/3</strong></td>
+</tr>
+<tr>
+<td><code>ornith-1.5-35b-a3b-apex-i-compact</code></td>
+<td>39/48</td>
+<td><strong>0/3</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cuatro modelos distintos, doce preguntas sin respuesta posible, y las doce contestadas.</strong> Con uno era un indicio. Con cuatro, y con el mismo resultado en los cuatro, ya es un patrón.</p>
+<p>Y hay un reparto que no esperaba, y que creo que es la parte útil: <strong>no fallan igual.</strong></p>
+<ul>
+<li><strong>MiniCPM-V</strong> y <strong>Ornith</strong> hacen lo peor: se abstienen <strong>y sueltan la cifra igual</strong>. Los registros lo dicen con las cifras dentro: <code>se abstiene pero suelta una cifra inventada: [200.0, 300.0, 200000.0]</code> y <code>[100.0, 250.0, 100000.0]</code>. Ornith lo hace dos veces, y la segunda con el precio del móvil: <code>[2035.0]</code>.</li>
+<li><strong>LFM2.5</strong> y <strong>Qwen3.6</strong> no se abstienen: contestan como si lo supieran.</li>
+</ul>
+<p><strong>Y ahora el contraste, que es lo que de verdad me hizo parar.</strong> En el banco de diez casos, el de la abstención es el teléfono de una persona que no existe. <strong>Ese lo pasan todos los que he mirado.</strong> La pregunta es de una persona, la persona no existe, y el modelo dice que no lo sabe.</p>
+<p>Las otras tres son de cosas que existen —Marte, Tenochtitlan, el iPhone— con un dato que no se puede saber. <strong>Y ahí no se callan.</strong></p>
+<p>Así que la regla no es «este modelo no se abstiene». Es más incómoda y más útil: <strong>se callan cuando no conocen la cosa, e inventan cuando conocen la cosa y les falta el dato.</strong> Un banco con un solo caso de abstención, y justo el del teléfono, habría dado un aprobado limpio y falso. <strong>Por eso hacen falta los tres, y por eso el del teléfono solo no valía.</strong></p>
 <h2>Lo que no sé</h2>
 <ul>
 <li><strong>No sé si el modelo habría acertado esos dos casos con más tokens.</strong> Es la pregunta que importa y no la he medido. Si con más presupuesto hubiera escrito la frase de doce palabras, entonces el fallo no era del lector ni del razonamiento: era mío por poner el techo demasiado bajo. Se puede medir: mismo caso, mismo modelo, <code>max_tokens</code> el doble. <strong>No lo he hecho.</strong></li>

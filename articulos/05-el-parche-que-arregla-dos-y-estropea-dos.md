@@ -97,6 +97,30 @@ Un modelo que se abstiene bien ante un teléfono inventado y contesta la poblaci
 
 Y del registro de los cuarenta y ocho sale un dato más, que corrige lo que yo había supuesto: `respuestas VACÍAS: 0/48 · casos con razonamiento aparte: 48/48`. Los cuarenta y ocho traían razonamiento aparte y **ninguno** llegó con `content` vacío. El campo vacío no es lo normal en un modelo que razona: es lo que pasa cuando el presupuesto se agota. Es un caso de borde, y por eso llevaba meses sin verse.
 
+## Cuatro modelos, doce abstenciones, ninguna pasada
+
+Y esto no se queda en un modelo. En la tanda del `18-11` pasé tres modelos más por el mismo banco de cuarenta y ocho casos. Los registros están al lado de los otros, en `~/.imperio/logs/`.
+
+| modelo | aciertos | abstención |
+|---|---|---|
+| `lfm2.5-24b-a2b-ud-q4_k_xl` | 43/48 | **0/3** |
+| `qwen3.6-35b-a3b-ud-q3_k_m` | 41/48 | **0/3** |
+| `minicpm-v-4.7-35b-a3b-q4_k_m` | 39/48 | **0/3** |
+| `ornith-1.5-35b-a3b-apex-i-compact` | 39/48 | **0/3** |
+
+**Cuatro modelos distintos, doce preguntas sin respuesta posible, y las doce contestadas.** Con uno era un indicio. Con cuatro, y con el mismo resultado en los cuatro, ya es un patrón.
+
+Y hay un reparto que no esperaba, y que creo que es la parte útil: **no fallan igual.**
+
+- **MiniCPM-V** y **Ornith** hacen lo peor: se abstienen **y sueltan la cifra igual**. Los registros lo dicen con las cifras dentro: `se abstiene pero suelta una cifra inventada: [200.0, 300.0, 200000.0]` y `[100.0, 250.0, 100000.0]`. Ornith lo hace dos veces, y la segunda con el precio del móvil: `[2035.0]`.
+- **LFM2.5** y **Qwen3.6** no se abstienen: contestan como si lo supieran.
+
+**Y ahora el contraste, que es lo que de verdad me hizo parar.** En el banco de diez casos, el de la abstención es el teléfono de una persona que no existe. **Ese lo pasan todos los que he mirado.** La pregunta es de una persona, la persona no existe, y el modelo dice que no lo sabe.
+
+Las otras tres son de cosas que existen —Marte, Tenochtitlan, el iPhone— con un dato que no se puede saber. **Y ahí no se callan.**
+
+Así que la regla no es «este modelo no se abstiene». Es más incómoda y más útil: **se callan cuando no conocen la cosa, e inventan cuando conocen la cosa y les falta el dato.** Un banco con un solo caso de abstención, y justo el del teléfono, habría dado un aprobado limpio y falso. **Por eso hacen falta los tres, y por eso el del teléfono solo no valía.**
+
 ## Lo que no sé
 
 - **No sé si el modelo habría acertado esos dos casos con más tokens.** Es la pregunta que importa y no la he medido. Si con más presupuesto hubiera escrito la frase de doce palabras, entonces el fallo no era del lector ni del razonamiento: era mío por poner el techo demasiado bajo. Se puede medir: mismo caso, mismo modelo, `max_tokens` el doble. **No lo he hecho.**
