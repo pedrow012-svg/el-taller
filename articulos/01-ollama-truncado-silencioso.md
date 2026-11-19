@@ -25,7 +25,7 @@ Documento de `300.000` caracteres, modelo `qwen2.5:3b`, por la puerta nativa (`/
 
 **Cuatro combinaciones. El mismo número. Y ninguna avisa.**
 
-**Y doblar el documento no lo mueve ni un token.** Eso no es un modelo que se queda corto: **es un servidor que recorta.**
+**Y doblar el documento no lo mueve ni un token:** con el `27B`, pasar de `300.000` a `600.000` caracteres seguía dando **`16.386`**. Eso no es un modelo que se queda corto: **es un servidor que recorta.**
 
 ## La regla que hay detrás: te dan la MITAD
 
@@ -35,7 +35,7 @@ Aquí está lo que convierte una anécdota en algo que te puede pasar esta tarde
 |---|---|
 | `4.096` | **2.050** |
 | `32.768` | **16.386** |
-| `65.536` | el documento entero, `31.478` |
+| `65.536` | `31.478` — **el documento entero** (cabe, así que esta fila no prueba el tope) |
 
 **Es sistemático.** No es un límite de memoria, no es un modelo que se cansa: **te dejan media ventana y te dicen que tienes la ventana entera.**
 
