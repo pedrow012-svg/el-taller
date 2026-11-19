@@ -107,8 +107,8 @@ $SALUD
 
   if ! escucha "$PREV_PUERTO"; then
     mkdir -p "$(dirname "$PREV_LOG")"
-    ( cd sitio && setsid nohup python3 -m http.server "$PREV_PUERTO" --bind 127.0.0.1 \
-        >> "$PREV_LOG" 2>&1 < /dev/null & )
+    ( cd sitio && setsid -f python3 -m http.server "$PREV_PUERTO" --bind 127.0.0.1 \
+        >> "$PREV_LOG" 2>&1 < /dev/null )
     sleep 1.5
   fi
   if escucha "$PREV_PUERTO"; then
@@ -121,6 +121,8 @@ $SALUD
   echo "══ 📬 PROPUESTO, NO PUBLICADO: $SHA · rama $RAMA ══"
   echo "   Para que lo veáis:  http://127.0.0.1:$PREV_PUERTO/  y  $PR"
   echo "   Para cerrarlo:      bash publica.sh cierra <PR> --visto \"Hefesto (...) + Pedro (...)\""
+  # la rama ya está empujada: se vuelve a main para que el árbol quede listo
+  git checkout -q main
   sella "PROPONE · rama $RAMA · $SHA · PR $PR · main intacto"
   exit 0
 fi
