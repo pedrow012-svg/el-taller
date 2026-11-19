@@ -152,6 +152,14 @@ footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);colo
 <p><strong>El error de método fue de los que se repiten, así que lo dejo escrito:</strong> el título del registro lo puse yo al empezar el experimento, y cuando cambié de motor no lo corregí. <strong>Después leí mi propio título y me lo creí.</strong></p>
 <p><strong>Y un segundo fallo propio, del mismo tipo:</strong> la primera versión de mi script ponía la palabra secreta <strong>al final</strong> del documento. Como el recorte se lleva el principio, encontrarla <strong>no probaba nada</strong>. <strong>⇒ un instrumento que no entiendes no mide: condena.</strong></p>
 <p><strong>⇒ y una tercera, para que se vea que el vicio era el mismo las tres veces:</strong> cuando la máquina tenía otro motor ocupando la tarjeta, Ollama devolvió <code>500</code> seco y estuve a punto de escribirlo como «no se reproduce». <strong>No era que no se reprodujera: era que no cabía.</strong></p>
+<h2>Hay una forma de que te avise, y yo escribí que no</h2>
+<p><code>/api/chat</code> acepta un campo <code>truncate</code>. <strong>Por defecto viene en <code>true</code>, y por eso trunca y se calla.</strong> Puesto a <code>false</code>, avisa:</p>
+<pre><code>    $ curl localhost:11434/api/chat -d '{"model":"...","messages":[...],"options":{"num_ctx":256},"stream":false,"truncate":false}'
+    {"error":"{\"error\":{\"code\":400,\"message\":\"request (351 tokens) exceeds the available context size (256 tokens), try increasing it\"}}"}
+</code></pre>
+<p>Y el mismo prompt de <code>351</code> tokens en una ventana de <code>256</code>, con <code>truncate: true</code>, <strong>devuelve respuesta</strong> en vez de error.</p>
+<p><strong>⇒ Lo que dice este artículo —que no hay forma de enterarse— es verdad a medias:</strong> es verdad <strong>con los valores por defecto</strong>, y es falso <strong>si pones <code>truncate: false</code></strong>. <strong>Me lo enseñó <code>rick-github</code></strong>, y lo escribo con su nombre, que es de quien es.</p>
+<p><strong>Y no cambia el hallazgo de la mitad:</strong> con el texto cabiendo de sobra, <code>num_ctx=32768</code> sigue leyendo <code>16.386</code>. <strong>Eso sigue sin explicación, y sigue siendo lo que pregunto.</strong></p>
 <h2>Lo que NO sé, y lo digo</h2>
 <p><strong>No he aislado de dónde sale el valor por defecto.</strong> No lo elige el modelo. <strong>Y no he medido si la mitad exacta se mantiene con todos los modelos:</strong> con uno de <code>27B</code> y <code>262.144</code> de contexto declarado medí <code>25.017</code> con <code>32.768</code> pedidos, que no es la mitad. <strong>⇒ hay algo ahí que no cuadra y no lo voy a disimular.</strong></p>
 <p><strong>Lo que sí está medido, y es lo que importa:</strong> cuatro combinaciones de versión y configuración, el mismo número, y el principio del documento perdido.</p>

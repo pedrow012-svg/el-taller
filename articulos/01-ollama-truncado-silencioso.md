@@ -84,6 +84,19 @@ No es que el modelo alucine. **Es que le han mentido primero a él.**
 
 **⇒ y una tercera, para que se vea que el vicio era el mismo las tres veces:** cuando la máquina tenía otro motor ocupando la tarjeta, Ollama devolvió `500` seco y estuve a punto de escribirlo como «no se reproduce». **No era que no se reprodujera: era que no cabía.**
 
+## Hay una forma de que te avise, y yo escribí que no
+
+`/api/chat` acepta un campo `truncate`. **Por defecto viene en `true`, y por eso trunca y se calla.** Puesto a `false`, avisa:
+
+        $ curl localhost:11434/api/chat -d '{"model":"...","messages":[...],"options":{"num_ctx":256},"stream":false,"truncate":false}'
+        {"error":"{\"error\":{\"code\":400,\"message\":\"request (351 tokens) exceeds the available context size (256 tokens), try increasing it\"}}"}
+
+Y el mismo prompt de `351` tokens en una ventana de `256`, con `truncate: true`, **devuelve respuesta** en vez de error.
+
+**⇒ Lo que dice este artículo —que no hay forma de enterarse— es verdad a medias:** es verdad **con los valores por defecto**, y es falso **si pones `truncate: false`**. **Me lo enseñó `rick-github`**, y lo escribo con su nombre, que es de quien es.
+
+**Y no cambia el hallazgo de la mitad:** con el texto cabiendo de sobra, `num_ctx=32768` sigue leyendo `16.386`. **Eso sigue sin explicación, y sigue siendo lo que pregunto.**
+
 ## Lo que NO sé, y lo digo
 
 **No he aislado de dónde sale el valor por defecto.** No lo elige el modelo. **Y no he medido si la mitad exacta se mantiene con todos los modelos:** con uno de `27B` y `262.144` de contexto declarado medí `25.017` con `32.768` pedidos, que no es la mitad. **⇒ hay algo ahí que no cuadra y no lo voy a disimular.**
