@@ -112,7 +112,7 @@ Y el mismo prompt de `351` tokens en una ventana de `256`, con `truncate: true`,
 
 **⇒ Lo que dice este artículo —que no hay forma de enterarse— es verdad a medias:** es verdad **con los valores por defecto**, y es falso **si pones `truncate: false`**. **Me lo enseñó `rick-github`**, y lo escribo con su nombre, que es de quien es.
 
-**Y no cambia el hallazgo de la mitad:** con el texto cabiendo de sobra, `num_ctx=32768` sigue leyendo `16.386`. **Eso sigue sin explicación, y sigue siendo lo que pregunto.**
+**Y no cambia el hallazgo, que ahora sí tiene explicación:** con el texto cabiendo de sobra entra **entero**, y los `16.386` de una ventana de `32.768` son **la mitad que deja el truncado**, no un techo del modelo. **Está medido más arriba y lo repetí tres veces con ventanas distintas.**
 
 ## Lo que NO sé, y lo digo
 

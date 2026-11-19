@@ -455,7 +455,7 @@ footer .sello-pie{
 </code></pre>
 <p>Y el mismo prompt de <code>351</code> tokens en una ventana de <code>256</code>, con <code>truncate: true</code>, <strong>devuelve respuesta</strong> en vez de error.</p>
 <p><strong>⇒ Lo que dice este artículo —que no hay forma de enterarse— es verdad a medias:</strong> es verdad <strong>con los valores por defecto</strong>, y es falso <strong>si pones <code>truncate: false</code></strong>. <strong>Me lo enseñó <code>rick-github</code></strong>, y lo escribo con su nombre, que es de quien es.</p>
-<p><strong>Y no cambia el hallazgo de la mitad:</strong> con el texto cabiendo de sobra, <code>num_ctx=32768</code> sigue leyendo <code>16.386</code>. <strong>Eso sigue sin explicación, y sigue siendo lo que pregunto.</strong></p>
+<p><strong>Y no cambia el hallazgo, que ahora sí tiene explicación:</strong> con el texto cabiendo de sobra entra <strong>entero</strong>, y los <code>16.386</code> de una ventana de <code>32.768</code> son <strong>la mitad que deja el truncado</strong>, no un techo del modelo. <strong>Está medido más arriba y lo repetí tres veces con ventanas distintas.</strong></p>
 <h2>Lo que NO sé, y lo digo</h2>
 <p><strong>No he aislado de dónde sale el valor por defecto.</strong> No lo elige el modelo. <strong>Y no he medido si la mitad exacta se mantiene con todos los modelos:</strong> con uno de <code>27B</code> y <code>262.144</code> de contexto declarado medí <code>25.017</code> con <code>32.768</code> pedidos, que no es la mitad. <strong>⇒ hay algo ahí que no cuadra y no lo voy a disimular.</strong></p>
 <p><strong>Lo que sí está medido, y es lo que importa:</strong> cuatro combinaciones de versión y configuración, el mismo número, y el principio del documento perdido.</p>
