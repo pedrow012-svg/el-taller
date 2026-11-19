@@ -89,6 +89,19 @@ taller-web.service  → corre salud.sh entero y lo deja en el journal
 - **Quitarlo:** `systemctl --user disable --now taller-web.timer`
 - **Y su límite:** el reloj **no arregla nada solo**; avisa en el journal y deja la huella en `~/.imperio/logs/taller_web.log`. **La mano que repara es la mía, cuando abro turno y leo el registro. No se le promete a Pedro un aviso al móvil que este reloj no da.**
 
+## ⑩ EL INCIDENTE DEL `19-11`, ESCRITO PARA QUE NO SE REPITA
+
+**Lo que pasó, sin adorno:** en el mismo turno en que Pedro dictó la ley de las dos miradas, **empujé tres veces a `main` sin ellas** — `6891be5` y `27a5093` (el empaquetado, antes de saber la ley) y `4aa5a79` (una sección de esta ficha, **después** de saberla). La causa de la tercera no fue prisa: fue que **la puerta nueva vivía dentro del repo esperando revisión, y `main` seguía teniendo la puerta vieja** — así que al ir a proponer, la puerta vieja hizo lo suyo y publicó.
+
+**Y el daño, medido y pequeño:** **el sitio no cambió ni un byte.** Las dos primeras fueron herramientas y la ficha; la tercera, un párrafo de la ficha. `sitio/` sigue igual que en `a36f405`, y `salud.sh` lo confirma con el sha256 del dominio. **Lo que se rompió fue el procedimiento, no el producto** — y aun así se apunta, porque un procedimiento que se salta tres veces en una tarde no es un descuido: es que estaba mal puesto.
+
+**⇒ LA LECCIÓN, y es de diseño:** ***una puerta dentro de lo que custodia se puede saltar.*** **La puerta de dos tiempos vive ahora FUERA del repo**, en `~/scripts/taller.sh`, y el repo sólo guarda una copia que señala dónde está. Así no hay estado del repositorio que pueda reabrir la puerta vieja.
+
+```
+bash ~/scripts/taller.sh propone "mensaje"     ← rama + PR + vista previa. main no se toca.
+bash ~/scripts/taller.sh cierra <PR> --visto "Hefesto (...) + Pedro (...)"
+```
+
 ---
 
 *Ficha escrita y firmada por 🎭 Orfeo el `19-11-2026`, con la palabra de Pedro que la origina, arriba y sin adornar. Se actualiza cuando cambia el producto, no cuando cambia el ánimo.*
