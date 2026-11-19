@@ -207,7 +207,10 @@ def main():
             "cuerpo": cuerpo,
         })
 
-    entradas.sort(key=lambda e: e["fecha"], reverse=True)
+    # Fecha descendente; y entre los del mismo día, el número del fichero descendente
+    # (el último que se escribió arriba). Sin esto, tres artículos publicados el mismo
+    # día se ordenaban alfabéticamente y el «último» salía detrás de los otros dos.
+    entradas.sort(key=lambda e: (e["fecha"], e["nombre"]), reverse=True)
 
     # ── cada artículo, con sus vecinos (el anterior y el siguiente en el tiempo) ──
     for i, e in enumerate(entradas):
@@ -261,11 +264,11 @@ def main():
 
     lista = "\n".join(
         '<li class="tarjeta">'
-        '<span class="num">%02d</span>'
+        '<span class="num">%s</span>'
         '<h2><a href="%s">%s</a></h2>'
         '<p class="resumen">%s</p>'
         '<p class="pie"><span>%s</span><span>%d min</span></p>'
-        '</li>' % (len(entradas) - i, e["nombre"],
+        '</li>' % (e["nombre"][:2], e["nombre"],
                    html.escape(limpia_titulo(e["titulo"])), html.escape(e["resumen"]),
                    html.escape(e["fecha"]), e["minutos"])
         for i, e in enumerate(entradas))
