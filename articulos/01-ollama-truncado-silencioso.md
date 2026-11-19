@@ -1,6 +1,6 @@
-titulo: Ollama te deja media ventana de contexto y no te dice cuál es la otra mitad
+titulo: Ollama tira media ventana de contexto cuando trunca, y no dice cuánto tiró
 fecha: 2026-11-19
-resumen: Cuatro combinaciones de versión y configuración, y las cuatro dan el mismo número. El presupuesto del prompt es la mitad de la ventana, el recorte se lleva el PRINCIPIO del documento, y en la puerta nativa no avisa ni en la última versión.
+resumen: Cuatro combinaciones de versión y configuración y las cuatro dan el mismo número. Medido: cuando el texto no cabe, el truncado corta a la mitad de la ventana y deja la otra mitad vacía. Con 16.384 tokens te quedas con 8.192. El recorte se lleva el PRINCIPIO del documento, y en la puerta nativa no avisa ni en la última versión.
 
 Voy a empezar por lo que más duele, porque el truncado no es la parte grave.
 
@@ -27,19 +27,36 @@ Documento de `300.000` caracteres, modelo `qwen2.5:3b`, por la puerta nativa (`/
 
 **Y doblar el documento no lo mueve ni un token:** con el `27B`, pasar de `300.000` a `600.000` caracteres seguía dando **`16.386`**. Eso no es un modelo que se queda corto: **es un servidor que recorta.**
 
-## La regla que hay detrás: te dan la MITAD
+## La regla que hay detrás: el truncado TIRA LA MITAD
 
-Aquí está lo que convierte una anécdota en algo que te puede pasar esta tarde. **El presupuesto del prompt no es la ventana: es la mitad de la ventana.**
+**Y aquí me tengo que corregir a mí mismo, porque lo primero que escribí en este artículo era falso.** Escribí que el presupuesto del prompt es la mitad de la ventana. **No es eso.** El presupuesto es la ventana **entera**; lo que hace el truncado es **dejar la mitad sin usar**.
 
-| contexto configurado | lo que lee de verdad |
+**La prueba, con `truncate: false`, que es cuando el motor no trunca y dice lo que hay.** Metí un texto de `14.030` tokens y pedí el límite a cada tamaño de ventana. El error devuelve dos números, los tokens del prompt y el tamaño de la ventana:
+
+| `num_ctx` | lo que dice el motor |
 |---|---|
-| `4.096` | **2.050** |
-| `32.768` | **16.386** |
-| `65.536` | `31.478` — **el documento entero** (cabe, así que esta fila no prueba el tope) |
+| `1.024` | prompt `14.030` · ventana `1.024` |
+| `2.048` | prompt `14.030` · ventana `2.048` |
+| `4.096` | prompt `14.030` · ventana `4.096` |
+| `8.192` | prompt `14.030` · ventana `8.192` |
 
-**Es sistemático.** No es un límite de memoria, no es un modelo que se cansa: **te dejan media ventana y te dicen que tienes la ventana entera.**
+**La ventana es la que pediste, exacta. No hay mitad.** Si el prompt cabe, cabe.
 
-**⇒ y el número no lo eliges tú: viene de una configuración que no ves.**
+**Ahora con el comportamiento por defecto, el que nadie toca.** Mismo texto, misma ventana, y miro cuántos tokens entraron de verdad:
+
+| `num_ctx` | entraron al prompt | de la ventana |
+|---|---|---|
+| `4.096` | **2.050** | `50 %` |
+| `8.192` | **4.098** | `50 %` |
+| `16.384` | **14.030** | `86 %` — **el texto entero** |
+
+**La tercera fila es la que lo explica todo.** Cuando el texto **cabe**, entra **entero**. La mitad no es un techo del modelo ni un límite de memoria: **es lo que queda cuando el truncado corta, y corta a la mitad de la ventana, no al final de ella.**
+
+**⇒ Y eso es peor que lo que yo había escrito.** No es que te den media ventana: es que **cuando el texto no cabe, tiran más de la cuenta y dejan media ventana vacía**. Con una ventana de `16.384` tokens te quedas con `8.192` y los otros `8.192` **no los usa nadie** — ni el prompt, que está cortado, ni la respuesta, que ocupa unas pocas líneas.
+
+**Lo que NO he medido, y lo digo:** no sé si esa reserva de la mitad depende de cuánto se le deje generar al modelo. Lo intenté moviendo el límite de respuesta y el modelo se enredó repitiendo y abortó antes de darme el número. **Queda pendiente, y no lo cuento como sabido.**
+
+**Los dos tokens de más** *(`2.050` en `4.096`, `4.098` en `8.192`)* son constantes, y no sé de dónde salen: probablemente los que añade la plantilla de la conversación. **Tampoco lo doy por sabido.**
 
 ## Y se llevan la MITAD QUE MÁS DUELE: el principio
 

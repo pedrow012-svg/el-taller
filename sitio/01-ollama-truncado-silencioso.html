@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ollama te deja media ventana de contexto y no te dice cuál es la otra mitad · El Taller</title>
-<meta name="description" content="Cuatro combinaciones de versión y configuración, y las cuatro dan el mismo número. El presupuesto del prompt es la mitad de la ventana, el recorte se lleva el PRINCIPIO del documento, y en la puerta nativa no avisa ni en la última versión.">
+<title>Ollama tira media ventana de contexto cuando trunca, y no dice cuánto tiró · El Taller</title>
+<meta name="description" content="Cuatro combinaciones de versión y configuración y las cuatro dan el mismo número. Medido: cuando el texto no cabe, el truncado corta a la mitad de la ventana y deja la otra mitad vacía. Con 16.384 tokens te quedas con 8.192. El recorte se lleva el PRINCIPIO del documento, y en la puerta nativa no avisa ni en la última versión.">
 <style>:root{--fondo:#111418;--papel:#171b21;--tinta:#e6e9ee;--tenue:#98a2b3;--acento:#e0a458;--linea:#2a313b;
 --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
 --texto:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -46,7 +46,7 @@ footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);colo
 <p class="lema">Medidas, pruebas y lo que se rompe.</p>
 </header>
 <article>
-<h1>Ollama te deja media ventana de contexto y no te dice cuál es la otra mitad</h1>
+<h1>Ollama tira media ventana de contexto cuando trunca, y no dice cuánto tiró</h1>
 <p class="meta">2026-11-19</p>
 <p>Voy a empezar por lo que más duele, porque el truncado no es la parte grave.</p>
 <p>Le dimos a un modelo un documento largo y contestó:</p>
@@ -100,32 +100,67 @@ footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);colo
 </table>
 <p><strong>Cuatro combinaciones. El mismo número. Y ninguna avisa.</strong></p>
 <p><strong>Y doblar el documento no lo mueve ni un token:</strong> con el <code>27B</code>, pasar de <code>300.000</code> a <code>600.000</code> caracteres seguía dando <strong><code>16.386</code></strong>. Eso no es un modelo que se queda corto: <strong>es un servidor que recorta.</strong></p>
-<h2>La regla que hay detrás: te dan la MITAD</h2>
-<p>Aquí está lo que convierte una anécdota en algo que te puede pasar esta tarde. <strong>El presupuesto del prompt no es la ventana: es la mitad de la ventana.</strong></p>
+<h2>La regla que hay detrás: el truncado TIRA LA MITAD</h2>
+<p><strong>Y aquí me tengo que corregir a mí mismo, porque lo primero que escribí en este artículo era falso.</strong> Escribí que el presupuesto del prompt es la mitad de la ventana. <strong>No es eso.</strong> El presupuesto es la ventana <strong>entera</strong>; lo que hace el truncado es <strong>dejar la mitad sin usar</strong>.</p>
+<p><strong>La prueba, con <code>truncate: false</code>, que es cuando el motor no trunca y dice lo que hay.</strong> Metí un texto de <code>14.030</code> tokens y pedí el límite a cada tamaño de ventana. El error devuelve dos números, los tokens del prompt y el tamaño de la ventana:</p>
 <table>
 <thead>
 <tr>
-<th>contexto configurado</th>
-<th>lo que lee de verdad</th>
+<th><code>num_ctx</code></th>
+<th>lo que dice el motor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1.024</code></td>
+<td>prompt <code>14.030</code> · ventana <code>1.024</code></td>
+</tr>
+<tr>
+<td><code>2.048</code></td>
+<td>prompt <code>14.030</code> · ventana <code>2.048</code></td>
+</tr>
+<tr>
+<td><code>4.096</code></td>
+<td>prompt <code>14.030</code> · ventana <code>4.096</code></td>
+</tr>
+<tr>
+<td><code>8.192</code></td>
+<td>prompt <code>14.030</code> · ventana <code>8.192</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>La ventana es la que pediste, exacta. No hay mitad.</strong> Si el prompt cabe, cabe.</p>
+<p><strong>Ahora con el comportamiento por defecto, el que nadie toca.</strong> Mismo texto, misma ventana, y miro cuántos tokens entraron de verdad:</p>
+<table>
+<thead>
+<tr>
+<th><code>num_ctx</code></th>
+<th>entraron al prompt</th>
+<th>de la ventana</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>4.096</code></td>
 <td><strong>2.050</strong></td>
+<td><code>50 %</code></td>
 </tr>
 <tr>
-<td><code>32.768</code></td>
-<td><strong>16.386</strong></td>
+<td><code>8.192</code></td>
+<td><strong>4.098</strong></td>
+<td><code>50 %</code></td>
 </tr>
 <tr>
-<td><code>65.536</code></td>
-<td><code>31.478</code> — <strong>el documento entero</strong> (cabe, así que esta fila no prueba el tope)</td>
+<td><code>16.384</code></td>
+<td><strong>14.030</strong></td>
+<td><code>86 %</code> — <strong>el texto entero</strong></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Es sistemático.</strong> No es un límite de memoria, no es un modelo que se cansa: <strong>te dejan media ventana y te dicen que tienes la ventana entera.</strong></p>
-<p><strong>⇒ y el número no lo eliges tú: viene de una configuración que no ves.</strong></p>
+<p><strong>La tercera fila es la que lo explica todo.</strong> Cuando el texto <strong>cabe</strong>, entra <strong>entero</strong>. La mitad no es un techo del modelo ni un límite de memoria: <strong>es lo que queda cuando el truncado corta, y corta a la mitad de la ventana, no al final de ella.</strong></p>
+<p><strong>⇒ Y eso es peor que lo que yo había escrito.</strong> No es que te den media ventana: es que <strong>cuando el texto no cabe, tiran más de la cuenta y dejan media ventana vacía</strong>. Con una ventana de <code>16.384</code> tokens te quedas con <code>8.192</code> y los otros <code>8.192</code> <strong>no los usa nadie</strong> — ni el prompt, que está cortado, ni la respuesta, que ocupa unas pocas líneas.</p>
+<p><strong>Lo que NO he medido, y lo digo:</strong> no sé si esa reserva de la mitad depende de cuánto se le deje generar al modelo. Lo intenté moviendo el límite de respuesta y el modelo se enredó repitiendo y abortó antes de darme el número. <strong>Queda pendiente, y no lo cuento como sabido.</strong></p>
+<p><strong>Los dos tokens de más</strong> <em>(<code>2.050</code> en <code>4.096</code>, <code>4.098</code> en <code>8.192</code>)</em> son constantes, y no sé de dónde salen: probablemente los que añade la plantilla de la conversación. <strong>Tampoco lo doy por sabido.</strong></p>
 <h2>Y se llevan la MITAD QUE MÁS DUELE: el principio</h2>
 <p><strong>Esto lo medí preguntando, no suponiendo.</strong> Un documento con una palabra distinta en la primera línea y otra en la última:</p>
 <ul>
