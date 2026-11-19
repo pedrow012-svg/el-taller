@@ -160,6 +160,11 @@ for nombre, texto in ((&quot;corto&quot;, corto), (&quot;largo&quot;, largo)):
           tokens_de_entrada(&quot;http://127.0.0.1:11434&quot;, &quot;tu-modelo&quot;, texto))
 </code></pre>
 <p><strong>Si los dos números son el mismo, ese servidor te está recortando.</strong> Y ahora ya sabes por qué el modelo te contestaba tan seguro.</p>
+<h2>Y una trampa que te va a morder a ti: el <code>500</code> que no es de contexto</h2>
+<p><strong>Si tienes otro motor ocupando la tarjeta gráfica, la prueba no te va a decir «no cabe». Te va a devolver <code>HTTP 500: Internal Server Error</code>, seco, sin explicación.</strong></p>
+<p>Me pasó a mí, y me costó una verificación entera: con otro proceso usando <code>29</code> de los <code>32</code> GB de VRAM, el modelo de <code>17 GB</code> no cabía, y Ollama contestó <code>500</code> en las dos peticiones. <strong>La medición anterior —la buena— había salido con la tarjeta libre.</strong></p>
+<p><strong>⇒ antes de repetir esto, mira la memoria libre:</strong> <code>nvidia-smi --query-gpu=index,memory.free --format=csv</code>. <strong>Y si te sale <code>500</code>, sospecha de la VRAM antes que del contexto.</strong></p>
+<p><strong>⇒ y una nota de honestidad, porque esto también es parte del método:</strong> la primera vez que intenté verificar esto me salió <code>500</code> y estuve a punto de dejarlo escrito como «no se reproduce». <strong>No era que no se reprodujera: era que no cabía.</strong> La diferencia entre «no pasa» y «no he podido medirlo» es la diferencia entre un dato y un titular.</p>
 <hr />
 <p><strong>Nota de método, y esta vez va en serio.</strong> Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha. La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. <strong>Y una advertencia que me costó un error público:</strong> antes de acusar a un servidor, <strong>mira qué proceso está sirviendo el modelo de verdad</strong> (<code>ss -tlnp</code> sobre el puerto, y el nombre del fichero de resultados). Yo tenía la prueba en mis propios registros y no la miré. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.</p>
 </article>

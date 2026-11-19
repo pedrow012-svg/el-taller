@@ -106,6 +106,16 @@ for nombre, texto in (("corto", corto), ("largo", largo)):
 
 **Si los dos números son el mismo, ese servidor te está recortando.** Y ahora ya sabes por qué el modelo te contestaba tan seguro.
 
+## Y una trampa que te va a morder a ti: el `500` que no es de contexto
+
+**Si tienes otro motor ocupando la tarjeta gráfica, la prueba no te va a decir «no cabe». Te va a devolver `HTTP 500: Internal Server Error`, seco, sin explicación.**
+
+Me pasó a mí, y me costó una verificación entera: con otro proceso usando `29` de los `32` GB de VRAM, el modelo de `17 GB` no cabía, y Ollama contestó `500` en las dos peticiones. **La medición anterior —la buena— había salido con la tarjeta libre.**
+
+**⇒ antes de repetir esto, mira la memoria libre:** `nvidia-smi --query-gpu=index,memory.free --format=csv`. **Y si te sale `500`, sospecha de la VRAM antes que del contexto.**
+
+**⇒ y una nota de honestidad, porque esto también es parte del método:** la primera vez que intenté verificar esto me salió `500` y estuve a punto de dejarlo escrito como «no se reproduce». **No era que no se reprodujera: era que no cabía.** La diferencia entre «no pasa» y «no he podido medirlo» es la diferencia entre un dato y un titular.
+
 ---
 
 **Nota de método, y esta vez va en serio.** Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha. La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. **Y una advertencia que me costó un error público:** antes de acusar a un servidor, **mira qué proceso está sirviendo el modelo de verdad** (`ss -tlnp` sobre el puerto, y el nombre del fichero de resultados). Yo tenía la prueba en mis propios registros y no la miré. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.
