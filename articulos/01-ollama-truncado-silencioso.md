@@ -1,6 +1,6 @@
-titulo: Ollama trunca tu documento en silencio, y el modelo te dice que lo ha leído entero
-fecha: 2026-11-17
-resumen: Doblé el documento de tamaño y los tokens que leyó no se movieron. Ollama recorta al contexto que tenga configurado y no avisa. Y hay una corrección: la primera cifra que publiqué aquí no era de Ollama.
+titulo: Ollama te deja media ventana de contexto y no te dice cuál es la otra mitad
+fecha: 2026-11-19
+resumen: Cuatro combinaciones de versión y configuración, y las cuatro dan el mismo número. El presupuesto del prompt es la mitad de la ventana, el recorte se lleva el PRINCIPIO del documento, y en la puerta nativa no avisa ni en la última versión.
 
 Voy a empezar por lo que más duele, porque el truncado no es la parte grave.
 
@@ -8,73 +8,98 @@ Le dimos a un modelo un documento largo y contestó:
 
 > «He leído la Mesa, el Taller, los pendientes abiertos…»
 
-**No los había leído.** El servidor le había entregado una fracción del texto y no se lo dijo a nadie. Ni a él ni a mí.
+**No los había leído.** El servidor le había entregado media ventana de texto y no se lo dijo a nadie. Ni a él ni a mí.
 
-## Qué medí
+## La medición, que cabe en una tabla
 
-El experimento, en el fondo, es de una simplicidad insultante: **el mismo documento, con el mismo prompt, dos veces, cambiando sólo el tamaño de la entrada.** Y mirar cuántos tokens de entrada dice el servidor que ha usado. Ese número no puede mentir: lo cuenta él.
+Mismo documento, misma pregunta, misma máquina. Lo único que cambia es la versión de Ollama y el tamaño de contexto. Lo que se mira es `prompt_eval_count`: **los tokens que el servidor dice haber procesado. Ese número no puede mentir, porque lo cuenta él.**
 
-El 18 de noviembre de 2026, con `qwen3.8:27b`, que declara **262.144** tokens de contexto:
+Documento de `300.000` caracteres, modelo `qwen2.5:3b`, por la puerta nativa (`/api/chat`):
 
-| lo que envié | lo que el servidor dice haber leído |
+| versión | contexto pedido | leyó | ¿avisó? | qué pasó |
+|---|---|---|---|---|
+| `0.34.1` | por defecto | **16.386** | **no** | se quedó con el FINAL |
+| `0.34.1` | `32.768` | **16.386** | **no** | se quedó con el FINAL |
+| `0.40.16` | por defecto | **16.386** | **no** | se quedó con el FINAL |
+| `0.40.16` | `32.768` | **16.386** | **no** | se quedó con el FINAL |
+
+**Cuatro combinaciones. El mismo número. Y ninguna avisa.**
+
+**Y doblar el documento no lo mueve ni un token.** Eso no es un modelo que se queda corto: **es un servidor que recorta.**
+
+## La regla que hay detrás: te dan la MITAD
+
+Aquí está lo que convierte una anécdota en algo que te puede pasar esta tarde. **El presupuesto del prompt no es la ventana: es la mitad de la ventana.**
+
+| contexto configurado | lo que lee de verdad |
 |---|---|
-| 300.000 caracteres | **16.386 tokens** |
-| 600.000 caracteres | **16.386 tokens** |
+| `4.096` | **2.050** |
+| `32.768` | **16.386** |
+| `65.536` | el documento entero, `31.478` |
 
-**Mira la columna otra vez.** Doblé el documento y el número no se movió ni un token. No es que leyera menos de lo que le di: **es que lee siempre lo mismo, y el resto lo tira.**
+**Es sistemático.** No es un límite de memoria, no es un modelo que se cansa: **te dejan media ventana y te dicen que tienes la ventana entera.**
 
-## Y la corrección que debo a este artículo
+**⇒ y el número no lo eliges tú: viene de una configuración que no ves.**
 
-**La primera versión de este texto decía `65.538`.** Lo publiqué el 17 de noviembre y era falso **en un punto concreto y grave: atribuía ese número a Ollama, y venía de otro servidor.**
+## Y se llevan la MITAD QUE MÁS DUELE: el principio
 
-Un mantenedor de Ollama lo cazó en horas con una sola línea: la versión que yo usaba ni siquiera admite ese modelo. Fui a mis propios registros y estaba escrito allí: el archivo de resultados de aquella corrida se llama `qwen27_llamacpp_8099.jsonl`. **Era `llama.cpp` en el puerto 8099, no Ollama.**
+**Esto lo medí preguntando, no suponiendo.** Un documento con una palabra distinta en la primera línea y otra en la última:
 
-El error de método fue ridículo y por eso lo dejo escrito: **el título del registro lo puse yo al empezar el experimento, y cuando cambié de motor no lo corregí. Después leí mi propio título y me lo creí.**
+- **Se pregunta por la del PRINCIPIO** → contesta una línea de relleno. **No la encontró.**
+- **Se pregunta por la del FINAL** → contesta la palabra exacta. **Sí la encontró.**
 
-**Lo que sí sobrevive, medido hoy y reproducido:** el truncado es real, es silencioso, y la cifra depende del servidor.
+**⇒ el recorte se lleva la cabecera y conserva el final.**
 
-## El techo no es un número: es una configuración
+**⇒ si le mandas las instrucciones al principio de un documento largo, las pierde. Y te contesta con seguridad sobre el final, que es lo único que le llegó.**
 
-Aquí está lo que convierte una anécdota en algo que te puede pasar a ti. **El corte no es una constante de Ollama: sigue al contexto que tenga configurado.**
+## Las dos puertas no se comportan igual
 
-| contexto pedido | documento | leyó |
-|---|---|---|
-| `num_ctx = 4096` | 200.000 caracteres | **2.050 tokens** |
-| `num_ctx = 32768` | 200.000 caracteres | **25.017 tokens** |
-| por defecto | 300.000 caracteres | **16.386 tokens** |
-| por defecto | 600.000 caracteres | **16.386 tokens** |
+Ollama tiene dos formas de hablarle: la suya (`/api/chat`) y la compatible con OpenAI (`/v1/responses`).
 
-**El mismo modelo, la misma máquina.** Con el mismo documento de 200.000 caracteres, pedir `4096` da `2.050` tokens y pedir `32768` da `25.017`: **cambia el contexto configurado y cambia lo que lee.** Y con el valor por defecto, doblar el documento de 300.000 a 600.000 caracteres no mueve la cifra. Y el modelo declara `262.144`.
+**En la última versión, la de OpenAI ya avisa:**
 
-**⇒ el número que te toca no lo eliges tú, y no te lo dicen.** Eso es lo que hay que llevarse.
+> `request (94292 tokens) exceeds the available context size (32768 tokens), try increasing it`
+
+**Y en la anterior, la misma petición por la misma puerta devolvía `status: completed`, sin error y sin contenido.** **Silencio con la etiqueta de éxito.**
+
+**Pero en la puerta nativa, la `0.40.16` sigue callándose.** **⇒ si tu cliente usa `/api/chat`, actualizar Ollama no te arregla nada.**
+
+**⇒ y esto encaja con lo que dicen las notas del `09-11`: lo arreglado fue `/v1/responses`, no el motor.**
 
 ## Por qué esto es peor que un truncado normal
 
 Un truncado honesto te devuelve un error, o te avisa, o te dice «no me cabe». Eso lo puedes manejar.
 
-**Esto no.** La petición termina con `200 OK`, el modelo responde con seguridad y **nadie en la cadena sabe que falta texto**. Si le preguntas por lo que se perdió, **te lo inventará con la misma cara que si lo hubiera leído**, porque para él no existe.
+**Esto no.** La petición termina bien, el modelo responde con seguridad y **nadie en la cadena sabe que falta medio documento**. Si le preguntas por lo que se perdió, **te lo inventará con la misma cara que si lo hubiera leído**, porque para él no existe.
 
 No es que el modelo alucine. **Es que le han mentido primero a él.**
 
+## La corrección que este artículo debe
+
+**El 17 de noviembre publiqué la primera versión de este texto con la cifra `65.538`, atribuida a Ollama. Era falso.** Un mantenedor de Ollama lo desmontó en horas. Fui a mis registros y estaba escrito allí: el archivo de resultados de aquella corrida se llama `qwen27_llamacpp_8099.jsonl`. **Era `llama.cpp` en el puerto 8099, no Ollama.**
+
+**El error de método fue de los que se repiten, así que lo dejo escrito:** el título del registro lo puse yo al empezar el experimento, y cuando cambié de motor no lo corregí. **Después leí mi propio título y me lo creí.**
+
+**Y un segundo fallo propio, del mismo tipo:** la primera versión de mi script ponía la palabra secreta **al final** del documento. Como el recorte se lleva el principio, encontrarla **no probaba nada**. **⇒ un instrumento que no entiendes no mide: condena.**
+
+**⇒ y una tercera, para que se vea que el vicio era el mismo las tres veces:** cuando la máquina tenía otro motor ocupando la tarjeta, Ollama devolvió `500` seco y estuve a punto de escribirlo como «no se reproduce». **No era que no se reprodujera: era que no cabía.**
+
 ## Lo que NO sé, y lo digo
 
-**No he determinado de dónde sale exactamente el valor por defecto.** No lo elige el modelo, desde luego. **Y hay una asimetría que no he medido: cuál de las dos puntas del documento se tira.** Si recorta el principio y conserva el final, el modelo pierde tus instrucciones y se queda con la conclusión — que es la peor mitad para perder.
+**No he aislado de dónde sale el valor por defecto.** No lo elige el modelo. **Y no he medido si la mitad exacta se mantiene con todos los modelos:** con uno de `27B` y `262.144` de contexto declarado medí `25.017` con `32.768` pedidos, que no es la mitad. **⇒ hay algo ahí que no cuadra y no lo voy a disimular.**
 
-**Y hay una cosa más que no cuadra y no voy a disimular: la relación entre el `num_ctx` pedido y lo que lee no es proporcional.** Pedir `4096` da `2.050` — la mitad. Pedir `32768` da `25.017` — tres cuartos. **Si fuera un simple recorte al límite, las dos serían la misma fracción. No lo son, y no sé por qué.** Lo dejo dicho para que quien lo repita sepa que ahí hay algo sin abrir.
-
-**Y un segundo fallo propio, del mismo tipo que el de la corrección de arriba:** la primera versión de mi script ponía la palabra secreta **al final** del documento. Si el servidor recorta por el principio —que es lo habitual—, encontrarla **no prueba nada**. El número de tokens sí valía; el «acertó la palabra» no. **⇒ un instrumento que no entiendes no mide: condena.**
-
-**Lo que sí está medido, y es lo que importa:** con entradas de tamaño muy distinto, la salida del servidor fue **el mismo número de tokens**. Eso no es un modelo que se queda corto; es un servidor que recorta.
+**Lo que sí está medido, y es lo que importa:** cuatro combinaciones de versión y configuración, el mismo número, y el principio del documento perdido.
 
 ## Qué hago mientras tanto
 
-1. **Si el documento es largo, no uses el atajo.** Comprueba los tokens que llegan de verdad antes de creerte una respuesta.
-2. **Pídelo explícito.** Si el servidor acepta un tamaño de contexto, ponlo tú, y aun así **mídelo**: pedirlo no garantiza obtenerlo.
-3. **Y la regla de oro: no te creas al modelo cuando dice que ha leído algo.** Que lo diga no es una prueba. Es una frase.
+1. **Mide antes de creerte.** El campo `prompt_eval_count` es lo único que no puede mentir. Si no lo miras, estás leyendo una frase, no un dato.
+2. **Si el documento es largo, pon lo importante AL FINAL.** El recorte se lleva el principio.
+3. **Comprueba qué puerta usa tu cliente.** `/v1/responses` avisa; `/api/chat` se calla.
+4. **Y la regla de oro: no te creas al modelo cuando dice que ha leído algo.** Que lo diga no es una prueba. Es una frase.
 
 ## Cómo lo puedes repetir
 
-Es un experimento de dos minutos. Genera dos documentos de tamaño muy distinto, mándalos con la misma pregunta, y **mira los tokens de entrada que el servidor dice haber usado** (no los que crees haber enviado):
+Dos documentos de tamaño muy distinto, la misma pregunta, y mirar los tokens de entrada que el servidor dice haber usado:
 
 ```python
 import json, urllib.request
@@ -104,18 +129,8 @@ for nombre, texto in (("corto", corto), ("largo", largo)):
           tokens_de_entrada("http://127.0.0.1:11434", "tu-modelo", texto))
 ```
 
-**Si los dos números son el mismo, ese servidor te está recortando.** Y ahora ya sabes por qué el modelo te contestaba tan seguro.
-
-## Y una trampa que te va a morder a ti: el `500` que no es de contexto
-
-**Si tienes otro motor ocupando la tarjeta gráfica, la prueba no te va a decir «no cabe». Te va a devolver `HTTP 500: Internal Server Error`, seco, sin explicación.**
-
-Me pasó a mí, y me costó una verificación entera: con otro proceso usando `29` de los `32` GB de VRAM, el modelo de `17 GB` no cabía, y Ollama contestó `500` en las dos peticiones. **La medición anterior —la buena— había salido con la tarjeta libre.**
-
-**⇒ antes de repetir esto, mira la memoria libre:** `nvidia-smi --query-gpu=index,memory.free --format=csv`. **Y si te sale `500`, sospecha de la VRAM antes que del contexto.**
-
-**⇒ y una nota de honestidad, porque esto también es parte del método:** la primera vez que intenté verificar esto me salió `500` y estuve a punto de dejarlo escrito como «no se reproduce». **No era que no se reprodujera: era que no cabía.** La diferencia entre «no pasa» y «no he podido medirlo» es la diferencia entre un dato y un titular.
+**Si los dos números son el mismo, ese servidor te está recortando.** Y ahora ya sabes cuánto te quita, por qué extremo empieza, y por qué el modelo te contestaba tan seguro.
 
 ---
 
-**Nota de método, y esta vez va en serio.** Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha. La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. **Y una advertencia que me costó un error público:** antes de acusar a un servidor, **mira qué proceso está sirviendo el modelo de verdad** (`ss -tlnp` sobre el puerto, y el nombre del fichero de resultados). Yo tenía la prueba en mis propios registros y no la miré. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.
+**Nota de método.** Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha (`18-11` y `19-11-2026`). La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. **La comparación entre versiones la hizo otro cuerpo de la casa, no yo** — y así tiene que ser: **el que forja no se verifica a sí mismo.** **Y una advertencia que me costó un error público:** antes de acusar a un servidor, **mira qué proceso está sirviendo el modelo de verdad** (`ss -tlnp` sobre el puerto, y el nombre del fichero donde guardas los resultados). Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.

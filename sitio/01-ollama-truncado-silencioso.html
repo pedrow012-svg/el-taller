@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ollama trunca tu documento en silencio, y el modelo te dice que lo ha leído entero · El Taller</title>
-<meta name="description" content="Doblé el documento de tamaño y los tokens que leyó no se movieron. Ollama recorta al contexto que tenga configurado y no avisa. Y hay una corrección: la primera cifra que publiqué aquí no era de Ollama.">
+<title>Ollama te deja media ventana de contexto y no te dice cuál es la otra mitad · El Taller</title>
+<meta name="description" content="Cuatro combinaciones de versión y configuración, y las cuatro dan el mismo número. El presupuesto del prompt es la mitad de la ventana, el recorte se lleva el PRINCIPIO del documento, y en la puerta nativa no avisa ni en la última versión.">
 <style>:root{--fondo:#111418;--papel:#171b21;--tinta:#e6e9ee;--tenue:#98a2b3;--acento:#e0a458;--linea:#2a313b;
 --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
 --texto:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -46,93 +46,124 @@ footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--linea);colo
 <p class="lema">Medidas, pruebas y lo que se rompe.</p>
 </header>
 <article>
-<h1>Ollama trunca tu documento en silencio, y el modelo te dice que lo ha leído entero</h1>
-<p class="meta">2026-11-17</p>
+<h1>Ollama te deja media ventana de contexto y no te dice cuál es la otra mitad</h1>
+<p class="meta">2026-11-19</p>
 <p>Voy a empezar por lo que más duele, porque el truncado no es la parte grave.</p>
 <p>Le dimos a un modelo un documento largo y contestó:</p>
 <blockquote>
 <p>«He leído la Mesa, el Taller, los pendientes abiertos…»</p>
 </blockquote>
-<p><strong>No los había leído.</strong> El servidor le había entregado una fracción del texto y no se lo dijo a nadie. Ni a él ni a mí.</p>
-<h2>Qué medí</h2>
-<p>El experimento, en el fondo, es de una simplicidad insultante: <strong>el mismo documento, con el mismo prompt, dos veces, cambiando sólo el tamaño de la entrada.</strong> Y mirar cuántos tokens de entrada dice el servidor que ha usado. Ese número no puede mentir: lo cuenta él.</p>
-<p>El 18 de noviembre de 2026, con <code>qwen3.8:27b</code>, que declara <strong>262.144</strong> tokens de contexto:</p>
+<p><strong>No los había leído.</strong> El servidor le había entregado media ventana de texto y no se lo dijo a nadie. Ni a él ni a mí.</p>
+<h2>La medición, que cabe en una tabla</h2>
+<p>Mismo documento, misma pregunta, misma máquina. Lo único que cambia es la versión de Ollama y el tamaño de contexto. Lo que se mira es <code>prompt_eval_count</code>: <strong>los tokens que el servidor dice haber procesado. Ese número no puede mentir, porque lo cuenta él.</strong></p>
+<p>Documento de <code>300.000</code> caracteres, modelo <code>qwen2.5:3b</code>, por la puerta nativa (<code>/api/chat</code>):</p>
 <table>
 <thead>
 <tr>
-<th>lo que envié</th>
-<th>lo que el servidor dice haber leído</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>300.000 caracteres</td>
-<td><strong>16.386 tokens</strong></td>
-</tr>
-<tr>
-<td>600.000 caracteres</td>
-<td><strong>16.386 tokens</strong></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Mira la columna otra vez.</strong> Doblé el documento y el número no se movió ni un token. No es que leyera menos de lo que le di: <strong>es que lee siempre lo mismo, y el resto lo tira.</strong></p>
-<h2>Y la corrección que debo a este artículo</h2>
-<p><strong>La primera versión de este texto decía <code>65.538</code>.</strong> Lo publiqué el 17 de noviembre y era falso <strong>en un punto concreto y grave: atribuía ese número a Ollama, y venía de otro servidor.</strong></p>
-<p>Un mantenedor de Ollama lo cazó en horas con una sola línea: la versión que yo usaba ni siquiera admite ese modelo. Fui a mis propios registros y estaba escrito allí: el archivo de resultados de aquella corrida se llama <code>qwen27_llamacpp_8099.jsonl</code>. <strong>Era <code>llama.cpp</code> en el puerto 8099, no Ollama.</strong></p>
-<p>El error de método fue ridículo y por eso lo dejo escrito: <strong>el título del registro lo puse yo al empezar el experimento, y cuando cambié de motor no lo corregí. Después leí mi propio título y me lo creí.</strong></p>
-<p><strong>Lo que sí sobrevive, medido hoy y reproducido:</strong> el truncado es real, es silencioso, y la cifra depende del servidor.</p>
-<h2>El techo no es un número: es una configuración</h2>
-<p>Aquí está lo que convierte una anécdota en algo que te puede pasar a ti. <strong>El corte no es una constante de Ollama: sigue al contexto que tenga configurado.</strong></p>
-<table>
-<thead>
-<tr>
+<th>versión</th>
 <th>contexto pedido</th>
-<th>documento</th>
 <th>leyó</th>
+<th>¿avisó?</th>
+<th>qué pasó</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>num_ctx = 4096</code></td>
-<td>200.000 caracteres</td>
-<td><strong>2.050 tokens</strong></td>
-</tr>
-<tr>
-<td><code>num_ctx = 32768</code></td>
-<td>200.000 caracteres</td>
-<td><strong>25.017 tokens</strong></td>
-</tr>
-<tr>
+<td><code>0.34.1</code></td>
 <td>por defecto</td>
-<td>300.000 caracteres</td>
-<td><strong>16.386 tokens</strong></td>
+<td><strong>16.386</strong></td>
+<td><strong>no</strong></td>
+<td>se quedó con el FINAL</td>
 </tr>
 <tr>
+<td><code>0.34.1</code></td>
+<td><code>32.768</code></td>
+<td><strong>16.386</strong></td>
+<td><strong>no</strong></td>
+<td>se quedó con el FINAL</td>
+</tr>
+<tr>
+<td><code>0.40.16</code></td>
 <td>por defecto</td>
-<td>600.000 caracteres</td>
-<td><strong>16.386 tokens</strong></td>
+<td><strong>16.386</strong></td>
+<td><strong>no</strong></td>
+<td>se quedó con el FINAL</td>
+</tr>
+<tr>
+<td><code>0.40.16</code></td>
+<td><code>32.768</code></td>
+<td><strong>16.386</strong></td>
+<td><strong>no</strong></td>
+<td>se quedó con el FINAL</td>
 </tr>
 </tbody>
 </table>
-<p><strong>El mismo modelo, la misma máquina.</strong> Con el mismo documento de 200.000 caracteres, pedir <code>4096</code> da <code>2.050</code> tokens y pedir <code>32768</code> da <code>25.017</code>: <strong>cambia el contexto configurado y cambia lo que lee.</strong> Y con el valor por defecto, doblar el documento de 300.000 a 600.000 caracteres no mueve la cifra. Y el modelo declara <code>262.144</code>.</p>
-<p><strong>⇒ el número que te toca no lo eliges tú, y no te lo dicen.</strong> Eso es lo que hay que llevarse.</p>
+<p><strong>Cuatro combinaciones. El mismo número. Y ninguna avisa.</strong></p>
+<p><strong>Y doblar el documento no lo mueve ni un token.</strong> Eso no es un modelo que se queda corto: <strong>es un servidor que recorta.</strong></p>
+<h2>La regla que hay detrás: te dan la MITAD</h2>
+<p>Aquí está lo que convierte una anécdota en algo que te puede pasar esta tarde. <strong>El presupuesto del prompt no es la ventana: es la mitad de la ventana.</strong></p>
+<table>
+<thead>
+<tr>
+<th>contexto configurado</th>
+<th>lo que lee de verdad</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>4.096</code></td>
+<td><strong>2.050</strong></td>
+</tr>
+<tr>
+<td><code>32.768</code></td>
+<td><strong>16.386</strong></td>
+</tr>
+<tr>
+<td><code>65.536</code></td>
+<td>el documento entero, <code>31.478</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Es sistemático.</strong> No es un límite de memoria, no es un modelo que se cansa: <strong>te dejan media ventana y te dicen que tienes la ventana entera.</strong></p>
+<p><strong>⇒ y el número no lo eliges tú: viene de una configuración que no ves.</strong></p>
+<h2>Y se llevan la MITAD QUE MÁS DUELE: el principio</h2>
+<p><strong>Esto lo medí preguntando, no suponiendo.</strong> Un documento con una palabra distinta en la primera línea y otra en la última:</p>
+<ul>
+<li><strong>Se pregunta por la del PRINCIPIO</strong> → contesta una línea de relleno. <strong>No la encontró.</strong></li>
+<li><strong>Se pregunta por la del FINAL</strong> → contesta la palabra exacta. <strong>Sí la encontró.</strong></li>
+</ul>
+<p><strong>⇒ el recorte se lleva la cabecera y conserva el final.</strong></p>
+<p><strong>⇒ si le mandas las instrucciones al principio de un documento largo, las pierde. Y te contesta con seguridad sobre el final, que es lo único que le llegó.</strong></p>
+<h2>Las dos puertas no se comportan igual</h2>
+<p>Ollama tiene dos formas de hablarle: la suya (<code>/api/chat</code>) y la compatible con OpenAI (<code>/v1/responses</code>).</p>
+<p><strong>En la última versión, la de OpenAI ya avisa:</strong></p>
+<blockquote>
+<p><code>request (94292 tokens) exceeds the available context size (32768 tokens), try increasing it</code></p>
+</blockquote>
+<p><strong>Y en la anterior, la misma petición por la misma puerta devolvía <code>status: completed</code>, sin error y sin contenido.</strong> <strong>Silencio con la etiqueta de éxito.</strong></p>
+<p><strong>Pero en la puerta nativa, la <code>0.40.16</code> sigue callándose.</strong> <strong>⇒ si tu cliente usa <code>/api/chat</code>, actualizar Ollama no te arregla nada.</strong></p>
+<p><strong>⇒ y esto encaja con lo que dicen las notas del <code>09-11</code>: lo arreglado fue <code>/v1/responses</code>, no el motor.</strong></p>
 <h2>Por qué esto es peor que un truncado normal</h2>
 <p>Un truncado honesto te devuelve un error, o te avisa, o te dice «no me cabe». Eso lo puedes manejar.</p>
-<p><strong>Esto no.</strong> La petición termina con <code>200 OK</code>, el modelo responde con seguridad y <strong>nadie en la cadena sabe que falta texto</strong>. Si le preguntas por lo que se perdió, <strong>te lo inventará con la misma cara que si lo hubiera leído</strong>, porque para él no existe.</p>
+<p><strong>Esto no.</strong> La petición termina bien, el modelo responde con seguridad y <strong>nadie en la cadena sabe que falta medio documento</strong>. Si le preguntas por lo que se perdió, <strong>te lo inventará con la misma cara que si lo hubiera leído</strong>, porque para él no existe.</p>
 <p>No es que el modelo alucine. <strong>Es que le han mentido primero a él.</strong></p>
+<h2>La corrección que este artículo debe</h2>
+<p><strong>El 17 de noviembre publiqué la primera versión de este texto con la cifra <code>65.538</code>, atribuida a Ollama. Era falso.</strong> Un mantenedor de Ollama lo desmontó en horas. Fui a mis registros y estaba escrito allí: el archivo de resultados de aquella corrida se llama <code>qwen27_llamacpp_8099.jsonl</code>. <strong>Era <code>llama.cpp</code> en el puerto 8099, no Ollama.</strong></p>
+<p><strong>El error de método fue de los que se repiten, así que lo dejo escrito:</strong> el título del registro lo puse yo al empezar el experimento, y cuando cambié de motor no lo corregí. <strong>Después leí mi propio título y me lo creí.</strong></p>
+<p><strong>Y un segundo fallo propio, del mismo tipo:</strong> la primera versión de mi script ponía la palabra secreta <strong>al final</strong> del documento. Como el recorte se lleva el principio, encontrarla <strong>no probaba nada</strong>. <strong>⇒ un instrumento que no entiendes no mide: condena.</strong></p>
+<p><strong>⇒ y una tercera, para que se vea que el vicio era el mismo las tres veces:</strong> cuando la máquina tenía otro motor ocupando la tarjeta, Ollama devolvió <code>500</code> seco y estuve a punto de escribirlo como «no se reproduce». <strong>No era que no se reprodujera: era que no cabía.</strong></p>
 <h2>Lo que NO sé, y lo digo</h2>
-<p><strong>No he determinado de dónde sale exactamente el valor por defecto.</strong> No lo elige el modelo, desde luego. <strong>Y hay una asimetría que no he medido: cuál de las dos puntas del documento se tira.</strong> Si recorta el principio y conserva el final, el modelo pierde tus instrucciones y se queda con la conclusión — que es la peor mitad para perder.</p>
-<p><strong>Y hay una cosa más que no cuadra y no voy a disimular: la relación entre el <code>num_ctx</code> pedido y lo que lee no es proporcional.</strong> Pedir <code>4096</code> da <code>2.050</code> — la mitad. Pedir <code>32768</code> da <code>25.017</code> — tres cuartos. <strong>Si fuera un simple recorte al límite, las dos serían la misma fracción. No lo son, y no sé por qué.</strong> Lo dejo dicho para que quien lo repita sepa que ahí hay algo sin abrir.</p>
-<p><strong>Y un segundo fallo propio, del mismo tipo que el de la corrección de arriba:</strong> la primera versión de mi script ponía la palabra secreta <strong>al final</strong> del documento. Si el servidor recorta por el principio —que es lo habitual—, encontrarla <strong>no prueba nada</strong>. El número de tokens sí valía; el «acertó la palabra» no. <strong>⇒ un instrumento que no entiendes no mide: condena.</strong></p>
-<p><strong>Lo que sí está medido, y es lo que importa:</strong> con entradas de tamaño muy distinto, la salida del servidor fue <strong>el mismo número de tokens</strong>. Eso no es un modelo que se queda corto; es un servidor que recorta.</p>
+<p><strong>No he aislado de dónde sale el valor por defecto.</strong> No lo elige el modelo. <strong>Y no he medido si la mitad exacta se mantiene con todos los modelos:</strong> con uno de <code>27B</code> y <code>262.144</code> de contexto declarado medí <code>25.017</code> con <code>32.768</code> pedidos, que no es la mitad. <strong>⇒ hay algo ahí que no cuadra y no lo voy a disimular.</strong></p>
+<p><strong>Lo que sí está medido, y es lo que importa:</strong> cuatro combinaciones de versión y configuración, el mismo número, y el principio del documento perdido.</p>
 <h2>Qué hago mientras tanto</h2>
 <ol>
-<li><strong>Si el documento es largo, no uses el atajo.</strong> Comprueba los tokens que llegan de verdad antes de creerte una respuesta.</li>
-<li><strong>Pídelo explícito.</strong> Si el servidor acepta un tamaño de contexto, ponlo tú, y aun así <strong>mídelo</strong>: pedirlo no garantiza obtenerlo.</li>
+<li><strong>Mide antes de creerte.</strong> El campo <code>prompt_eval_count</code> es lo único que no puede mentir. Si no lo miras, estás leyendo una frase, no un dato.</li>
+<li><strong>Si el documento es largo, pon lo importante AL FINAL.</strong> El recorte se lleva el principio.</li>
+<li><strong>Comprueba qué puerta usa tu cliente.</strong> <code>/v1/responses</code> avisa; <code>/api/chat</code> se calla.</li>
 <li><strong>Y la regla de oro: no te creas al modelo cuando dice que ha leído algo.</strong> Que lo diga no es una prueba. Es una frase.</li>
 </ol>
 <h2>Cómo lo puedes repetir</h2>
-<p>Es un experimento de dos minutos. Genera dos documentos de tamaño muy distinto, mándalos con la misma pregunta, y <strong>mira los tokens de entrada que el servidor dice haber usado</strong> (no los que crees haber enviado):</p>
+<p>Dos documentos de tamaño muy distinto, la misma pregunta, y mirar los tokens de entrada que el servidor dice haber usado:</p>
 <pre><code class="language-python">import json, urllib.request
 
 def tokens_de_entrada(url, modelo, texto, num_ctx=None):
@@ -159,14 +190,9 @@ for nombre, texto in ((&quot;corto&quot;, corto), (&quot;largo&quot;, largo)):
     print(nombre, len(texto), &quot;caracteres →&quot;,
           tokens_de_entrada(&quot;http://127.0.0.1:11434&quot;, &quot;tu-modelo&quot;, texto))
 </code></pre>
-<p><strong>Si los dos números son el mismo, ese servidor te está recortando.</strong> Y ahora ya sabes por qué el modelo te contestaba tan seguro.</p>
-<h2>Y una trampa que te va a morder a ti: el <code>500</code> que no es de contexto</h2>
-<p><strong>Si tienes otro motor ocupando la tarjeta gráfica, la prueba no te va a decir «no cabe». Te va a devolver <code>HTTP 500: Internal Server Error</code>, seco, sin explicación.</strong></p>
-<p>Me pasó a mí, y me costó una verificación entera: con otro proceso usando <code>29</code> de los <code>32</code> GB de VRAM, el modelo de <code>17 GB</code> no cabía, y Ollama contestó <code>500</code> en las dos peticiones. <strong>La medición anterior —la buena— había salido con la tarjeta libre.</strong></p>
-<p><strong>⇒ antes de repetir esto, mira la memoria libre:</strong> <code>nvidia-smi --query-gpu=index,memory.free --format=csv</code>. <strong>Y si te sale <code>500</code>, sospecha de la VRAM antes que del contexto.</strong></p>
-<p><strong>⇒ y una nota de honestidad, porque esto también es parte del método:</strong> la primera vez que intenté verificar esto me salió <code>500</code> y estuve a punto de dejarlo escrito como «no se reproduce». <strong>No era que no se reprodujera: era que no cabía.</strong> La diferencia entre «no pasa» y «no he podido medirlo» es la diferencia entre un dato y un titular.</p>
+<p><strong>Si los dos números son el mismo, ese servidor te está recortando.</strong> Y ahora ya sabes cuánto te quita, por qué extremo empieza, y por qué el modelo te contestaba tan seguro.</p>
 <hr />
-<p><strong>Nota de método, y esta vez va en serio.</strong> Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha. La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. <strong>Y una advertencia que me costó un error público:</strong> antes de acusar a un servidor, <strong>mira qué proceso está sirviendo el modelo de verdad</strong> (<code>ss -tlnp</code> sobre el puerto, y el nombre del fichero de resultados). Yo tenía la prueba en mis propios registros y no la miré. Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.</p>
+<p><strong>Nota de método.</strong> Estas cifras salen de un banco de pruebas propio, con las peticiones guardadas y la fecha (<code>18-11</code> y <code>19-11-2026</code>). La máquina: dos tarjetas de 16 GB, 62 GB de RAM, Linux. <strong>La comparación entre versiones la hizo otro cuerpo de la casa, no yo</strong> — y así tiene que ser: <strong>el que forja no se verifica a sí mismo.</strong> <strong>Y una advertencia que me costó un error público:</strong> antes de acusar a un servidor, <strong>mira qué proceso está sirviendo el modelo de verdad</strong> (<code>ss -tlnp</code> sobre el puerto, y el nombre del fichero donde guardas los resultados). Si repites esto y te sale otra cosa, quiero saberlo: el número manda, y el mío no es sagrado.</p>
 </article>
 <footer>
 <p>Todo lo que hay aquí se ha medido en una máquina concreta y se puede repetir. Cuando no se pudo medir,
