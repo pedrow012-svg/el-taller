@@ -47,7 +47,7 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 ## ⑤ ESTADO MEDIDO (19-11-2026, 19:3x)
 
 - **8 páginas** en `sitemap.xml` · **6 artículos** publicados · índice con 6 tarjetas + `temas.html`.
-- `HEAD` = `a36f405` · árbol limpio · remoto al día.
+- **El `HEAD` no se apunta aquí a propósito:** cambia con cada publicación y este papel se quedaría mintiendo. **Quien dice la verdad es `bash salud.sh`**, que compara el dominio con lo de casa.
 - En vivo: la portada y los 8 HTML **byte a byte iguales** a los locales (`curl` + `sha256`), `200`.
 - Google Search Console: propiedad verificada (etiqueta HTML en `dbbc216`), `sitemap.xml` **«CORRECTO · 7 páginas descubiertas»** (el 8º es la nota 06, posterior al envío).
 - Espejo: `200`, `noindex, follow` + `canonical` al dominio, Pages rehecho por mí tras el apagón del `19-11`.
@@ -66,6 +66,13 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 - **`IndexNow`** (Bing/Yandex): avisar a los buscadores de las páginas nuevas. No necesita cuenta ni dinero; sí su «sí» porque manda datos a terceros.
 - **El enlace del espejo:** hoy está `noindex`. Si algún día quiere que el espejo también compita, es una línea (`marca_espejo`) y su palabra.
 - **La nota `07`:** hay material (el hilo del foro, el `truncate`, el banco de la ventana). Escribirla es mío; publicarla es suyo.
+
+## ⑧ EL PRIMER FUEGO DE LAS PIEZAS, CON NÚMEROS (`19-11-2026`, 19:2x)
+
+- **`salud.sh`** — primera pasada completa: **3,4 s**, 11 comprobaciones, el dominio sirve las 8 páginas + `sitemap` + `robots` **byte a byte iguales**, el espejo con `noindex`, y el certificado con **88 días**. El único fallo que dio fue el correcto: los ficheros que acababa de escribir estaban sin commitear.
+- **`publica.sh`** — dos publicaciones de verdad, no de prueba: `6891be5` (las cuatro piezas) y la de esta corrección. Las dos pasaron la verificación en casa y el dominio coincidió en el primer sondeo. **Ninguna página del sitio cambió** — era el punto: empaquetar no toca el contenido.
+- **`respaldo.sh`** — bundle de **1,7 MB** con la historia entera, verificado por `git bundle verify`, conteniendo el `HEAD`, y **restaurado de verdad**: `git clone` del bundle en una copia, `construye.py` y `diff -rq` contra el original **sin una sola diferencia**. La copia de prueba salió por `gio trash`.
+- **`producto.sh estado`** — ahora el taller sale en el estado de la casa, y se ve arriba: `taller.dantehef.dev ARRIBA (web, http 200)` junto a `piel`, `path` y `mecatech`. **No se duerme con `congela`**: no ocupa VRAM ni puerto local; vive en Pages.
 
 ---
 
