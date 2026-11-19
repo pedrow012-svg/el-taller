@@ -64,6 +64,7 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 ## ⑦ LO QUE ESTÁ ABIERTO, Y ES DE PEDRO
 
 - **`IndexNow`** (Bing/Yandex): avisar a los buscadores de las páginas nuevas. No necesita cuenta ni dinero; sí su «sí» porque manda datos a terceros.
+- **El temporizador ya NO está aquí: está hecho** (`19-11-2026`, con su «sí»). Ver ⑨.
 - **El enlace del espejo:** hoy está `noindex`. Si algún día quiere que el espejo también compita, es una línea (`marca_espejo`) y su palabra.
 - **La nota `07`:** hay material (el hilo del foro, el `truncate`, el banco de la ventana). Escribirla es mío; publicarla es suyo.
 
@@ -73,6 +74,20 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 - **`publica.sh`** — dos publicaciones de verdad, no de prueba: `6891be5` (las cuatro piezas) y la de esta corrección. Las dos pasaron la verificación en casa y el dominio coincidió en el primer sondeo. **Ninguna página del sitio cambió** — era el punto: empaquetar no toca el contenido.
 - **`respaldo.sh`** — bundle de **1,7 MB** con la historia entera, verificado por `git bundle verify`, conteniendo el `HEAD`, y **restaurado de verdad**: `git clone` del bundle en una copia, `construye.py` y `diff -rq` contra el original **sin una sola diferencia**. La copia de prueba salió por `gio trash`.
 - **`producto.sh estado`** — ahora el taller sale en el estado de la casa, y se ve arriba: `taller.dantehef.dev ARRIBA (web, http 200)` junto a `piel`, `path` y `mecatech`. **No se duerme con `congela`**: no ocupa VRAM ni puerto local; vive en Pages.
+
+## ⑨ EL RELOJ DEL TALLER (hecho el `19-11-2026`, con el «sí» de Pedro)
+
+**Un sitio web no se cae con un aviso: se cae en silencio. Por eso ahora tiene reloj propio, y es de usuario (no de la casa, no pide `sudo`):**
+
+```
+taller-web.timer    → cada día a las 08:10 (Persistent=true: si el equipo estaba apagado, lo hace al arrancar)
+taller-web.service  → corre salud.sh entero y lo deja en el journal
+```
+
+- **Probado el `19-11` a las 19:37:** disparado a mano, **código 0 · 11 comprobaciones en verde**, y la última línea del journal dice «Finished taller-web.service».
+- **Mirar lo que vio:** `journalctl --user -u taller-web.service -n 30`
+- **Quitarlo:** `systemctl --user disable --now taller-web.timer`
+- **Y su límite:** el reloj **no arregla nada solo**; avisa en el journal y deja la huella en `~/.imperio/logs/taller_web.log`. **La mano que repara es la mía, cuando abro turno y leo el registro. No se le promete a Pedro un aviso al móvil que este reloj no da.**
 
 ---
 
