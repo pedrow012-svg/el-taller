@@ -92,6 +92,7 @@ PLANTILLA = """<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="google-site-verification" content="STZHGIxNZcrQlTB4OGM90fCpiz5AYfo35sD9MkqIc1Q">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{titulo} · El Taller</title>
 <meta name="description" content="{resumen}">
@@ -122,6 +123,7 @@ PORTADA = """<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="google-site-verification" content="STZHGIxNZcrQlTB4OGM90fCpiz5AYfo35sD9MkqIc1Q">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Temas · El Taller</title>
 <meta name="description" content="Medidas reales de modelos de lenguaje en hardware de casa.">
