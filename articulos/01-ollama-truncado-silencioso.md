@@ -60,6 +60,10 @@ No es que el modelo alucine. **Es que le han mentido primero a él.**
 
 **No he determinado de dónde sale exactamente el valor por defecto.** No lo elige el modelo, desde luego. **Y hay una asimetría que no he medido: cuál de las dos puntas del documento se tira.** Si recorta el principio y conserva el final, el modelo pierde tus instrucciones y se queda con la conclusión — que es la peor mitad para perder.
 
+**Y hay una cosa más que no cuadra y no voy a disimular: la relación entre el `num_ctx` pedido y lo que lee no es proporcional.** Pedir `4096` da `2.050` — la mitad. Pedir `32768` da `25.017` — tres cuartos. **Si fuera un simple recorte al límite, las dos serían la misma fracción. No lo son, y no sé por qué.** Lo dejo dicho para que quien lo repita sepa que ahí hay algo sin abrir.
+
+**Y un segundo fallo propio, del mismo tipo que el de la corrección de arriba:** la primera versión de mi script ponía la palabra secreta **al final** del documento. Si el servidor recorta por el principio —que es lo habitual—, encontrarla **no prueba nada**. El número de tokens sí valía; el «acertó la palabra» no. **⇒ un instrumento que no entiendes no mide: condena.**
+
 **Lo que sí está medido, y es lo que importa:** con entradas de tamaño muy distinto, la salida del servidor fue **el mismo número de tokens**. Eso no es un modelo que se queda corto; es un servidor que recorta.
 
 ## Qué hago mientras tanto
