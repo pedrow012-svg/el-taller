@@ -15,6 +15,7 @@ ARTICULOS = os.path.join(AQUI, "articulos")
 SITIO = os.path.join(AQUI, "sitio")
 CSS = os.path.join(AQUI, "plantilla", "estilo.css")
 ENTRADA = os.path.join(AQUI, "plantilla", "entrada.html")
+INDEXNOW_CLAVE = "ef712d55bfa6505f1a85ce7d9ef26244"   # clave de IndexNow (indexnow.org, 20-11-2026)
 BASE = "https://taller.dantehef.dev"
 
 # El sello de la pestaña del navegador: el mismo ET del encabezado, en SVG
@@ -324,6 +325,14 @@ def main():
                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s\n</urlset>\n'
                 % cuerpo_sitemap)
     print("  ✅ sitemap.xml (%d URLs)" % len(urls))
+
+    # 20-11-2026 · LA CLAVE DE INDEXNOW. Un fichero de texto en la raiz con una cadena
+    # aleatoria: es la prueba de que el sitio es nuestro cuando avisamos a Bing y Yandex
+    # de que hay URLs nuevas. Sin este fichero el aviso se rechaza. No sirve para nada
+    # mas, no se lee, no se enlaza: existe solo para que ellos puedan comprobarlo.
+    with open(os.path.join(SITIO, INDEXNOW_CLAVE + ".txt"), "w", encoding="utf-8") as f:
+        f.write(INDEXNOW_CLAVE + chr(10))
+    print("  \u2705 " + INDEXNOW_CLAVE + ".txt (la clave de IndexNow)")
 
     with open(os.path.join(SITIO, "favicon.svg"), "w", encoding="utf-8") as f:
         f.write(FAVICON)
