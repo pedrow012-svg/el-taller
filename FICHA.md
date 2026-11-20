@@ -65,7 +65,7 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 
 - **`IndexNow`** (Bing/Yandex): avisar a los buscadores de las páginas nuevas. No necesita cuenta ni dinero; sí su «sí» porque manda datos a terceros.
 - **El temporizador ya NO está aquí: está hecho** (`19-11-2026`, con su «sí»). Ver ⑨.
-- **DECIDIDO el `19-11-2026`, palabra de Pedro: «déjala callada» ⇒ **el espejo se queda `noindex` y no compite con el dominio.** No compite porque dos direcciones con el mismo texto hacen que Google elija una y reparta la fuerza entre las dos; su valor es ser **el repuesto** si el dominio fallara. Si algún día quiere que compita, es una línea (`marca_espejo`) y su palabra — pero hoy está decidido, y no se reabre solo.
+- **DECIDIDO el `19-11-2026`, palabra de Pedro: «déjala callada»** ⇒ el espejo se queda `noindex` y no compite con el dominio. No compite porque dos direcciones con el mismo texto hacen que Google elija una y reparta la fuerza entre las dos; su valor es ser **el repuesto** si el dominio fallara. Si algún día quiere que compita, es una línea (`marca_espejo`) y su palabra — pero hoy está decidido, y no se reabre solo.
 - **La nota `07`:** hay material (el hilo del foro, el `truncate`, el banco de la ventana). Escribirla es mío; publicarla es suyo.
 
 ## ⑧ EL PRIMER FUEGO DE LAS PIEZAS, CON NÚMEROS (`19-11-2026`, 19:2x)
