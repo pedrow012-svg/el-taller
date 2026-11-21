@@ -17,6 +17,19 @@ CSS = os.path.join(AQUI, "plantilla", "estilo.css")
 ENTRADA = os.path.join(AQUI, "plantilla", "entrada.html")
 INDEXNOW_CLAVE = "ef712d55bfa6505f1a85ce7d9ef26244"   # clave de IndexNow (indexnow.org, 20-11-2026)
 BASE = "https://taller.dantehef.dev"
+# ── la marca y la casa detrás (decisión de Pedro, 21-11-2026) ──────────────
+# El nombre a secas —«El Taller»— es genérico: buscado, salen panaderías y
+# restaurantes. El nombre COMPLETO es el que se declara a los buscadores; la
+# marca visible sigue corta. Y la Organization dice a quién pertenece: sameAs
+# y parentOrganization son lo que la convierte en ENTIDAD y no en un anónimo.
+CASA = "https://dantehef.dev"
+PIEL = "https://piel.dantehef.dev"
+NOMBRE = "El Taller"
+NOMBRE_COMPLETO = "El Taller de DanteHef"
+ORGANIZACION = {"@type": "Organization", "name": NOMBRE_COMPLETO, "url": BASE + "/",
+                "sameAs": [CASA, PIEL],
+                "parentOrganization": {"@type": "Organization",
+                                       "name": "DanteHef", "url": CASA}}
 
 # El sello de la pestaña del navegador: el mismo ET del encabezado, en SVG
 # (1 KB, sin fuentes, nítido en cualquier pantalla).
@@ -43,7 +56,7 @@ def cabeza(titulo, descripcion, ruta, imagen=True, tipo="website", fecha="", jso
         '<link rel="canonical" href="%s">' % url,
         '<meta name="theme-color" content="#0a0a0a">',
         '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
-        '<meta property="og:site_name" content="El Taller">',
+        '<meta property="og:site_name" content="%s">' % NOMBRE_COMPLETO,
         '<meta property="og:locale" content="es_ES">',
         '<meta property="og:url" content="%s">' % url,
         '<meta name="twitter:card" content="summary_large_image">',
@@ -67,7 +80,7 @@ PIE = """<footer>
 <p>Todo lo que hay aquí se ha medido en una máquina concreta y se puede repetir. Cuando no se pudo medir,
 se dice. Los números llevan su fecha y su comando.</p>
 <p>Texto bajo <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a>.</p>
-<p class="sello-pie">El Taller · taller.dantehef.dev</p>
+<p class="sello-pie">El Taller de DanteHef · taller.dantehef.dev</p>
 </footer>"""
 # ── La ventana de preguntas. Es un chat DE VERDAD a medias: el aspecto es de chat,
 # pero detrás no hay servidor; el formulario abre el correo de quien escribe.
@@ -242,7 +255,7 @@ def main():
             "inLanguage": "es",
             "image": "%s/img/portada-ia.jpg" % BASE,
             "author": {"@type": "Person", "name": "Pedro", "url": BASE},
-            "publisher": {"@type": "Organization", "name": "El Taller", "url": BASE},
+            "publisher": ORGANIZACION,
             "keywords": e["tema"],
         }
         pagina = PLANTILLA.format(
@@ -277,10 +290,11 @@ def main():
     jsonld_indice = {
         "@context": "https://schema.org",
         "@type": "Blog",
-        "name": "El Taller",
+        "name": NOMBRE_COMPLETO,
         "url": BASE + "/temas.html",
         "inLanguage": "es",
         "description": "Pruebas de modelos de lenguaje sobre máquina casera. Datos públicos y contrastables.",
+        "publisher": ORGANIZACION,
         "blogPost": [{"@type": "BlogPosting", "headline": limpia_titulo(e["titulo"]),
                       "url": "%s/%s" % (BASE, e["nombre"]), "datePublished": e["fecha"]}
                      for e in entradas],
