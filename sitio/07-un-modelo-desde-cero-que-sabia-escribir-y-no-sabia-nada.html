@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="google-site-verification" content="STZHGIxNZcrQlTB4OGM90fCpiz5AYfo35sD9MkqIc1Q">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nuestro modelo aprendió castellano en 1,09 bits por carácter; la etapa que iba a enseñarle nuestra voz lo dejó en 3,77 · El Taller</title>
+<meta name="description" content="Entrenamos desde cero un modelo de 74,7 millones de parámetros — arquitectura, tokenizador y datos propios —. Aprendió castellano con 1,09 bits por carácter. La etapa final, la que iba a meterle nuestra forma de escribir, multiplicó la perplejidad por 246. Y la cifra que decidía de verdad llevaba semanas delante de nosotros: un examen de 20 preguntas.">
+<meta property="og:title" content="Nuestro modelo aprendió castellano en 1,09 bits por carácter; la etapa que iba a enseñarle nuestra voz lo dejó en 3,77">
+<meta property="og:description" content="Entrenamos desde cero un modelo de 74,7 millones de parámetros — arquitectura, tokenizador y datos propios —. Aprendió castellano con 1,09 bits por carácter. La etapa final, la que iba a meterle nuestra forma de escribir, multiplicó la perplejidad por 246. Y la cifra que decidía de verdad llevaba semanas delante de nosotros: un examen de 20 preguntas.">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://taller.dantehef.dev/07-un-modelo-desde-cero-que-sabia-escribir-y-no-sabia-nada.html">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:site_name" content="El Taller de DanteHef">
+<meta property="og:locale" content="es_ES">
+<meta property="og:url" content="https://taller.dantehef.dev/07-un-modelo-desde-cero-que-sabia-escribir-y-no-sabia-nada.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://taller.dantehef.dev/img/portada-ia.jpg">
+<meta name="twitter:image" content="https://taller.dantehef.dev/img/portada-ia.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Nuestro modelo aprendió castellano en 1,09 bits por carácter; la etapa que iba a enseñarle nuestra voz lo dejó en 3,77", "description": "Entrenamos desde cero un modelo de 74,7 millones de parámetros — arquitectura, tokenizador y datos propios —. Aprendió castellano con 1,09 bits por carácter. La etapa final, la que iba a meterle nuestra forma de escribir, multiplicó la perplejidad por 246. Y la cifra que decidía de verdad llevaba semanas delante de nosotros: un examen de 20 preguntas.", "url": "https://taller.dantehef.dev/07-un-modelo-desde-cero-que-sabia-escribir-y-no-sabia-nada.html", "mainEntityOfPage": "https://taller.dantehef.dev/07-un-modelo-desde-cero-que-sabia-escribir-y-no-sabia-nada.html", "datePublished": "2026-11-22", "dateModified": "2026-11-22", "inLanguage": "es", "image": "https://taller.dantehef.dev/img/portada-ia.jpg", "author": {"@type": "Person", "name": "Pedro", "url": "https://taller.dantehef.dev"}, "publisher": {"@type": "Organization", "name": "El Taller de DanteHef", "url": "https://taller.dantehef.dev/", "sameAs": ["https://dantehef.dev", "https://piel.dantehef.dev"], "parentOrganization": {"@type": "Organization", "name": "DanteHef", "url": "https://dantehef.dev"}}, "keywords": "entrenamiento"}</script>
+<style>/* ═══════════════════════════════════════════════════════════════════════
+   EL TALLER · hoja de estilo del INTERIOR
+   Paleta del Panel DanteHef: negro #0a0a0a / #0d0d0d y cian neón #00f2ff,
+   con los brillos de la casa. Sin fuentes de fuera, sin imágenes, sin JS.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+  --negro:#0a0a0a;
+  --panel:#0d0d0d;
+  --panel2:#111314;
+  --cian:#00f2ff;
+  --cian-te:#00d4e6;
+  --tinta:#e9f4f6;
+  --tenue:#8ea3a8;
+  --apagado:#5d7276;
+  --linea:rgba(0,242,255,.14);
+  --linea-fuerte:rgba(0,242,255,.32);
+  --brillo:0 0 15px rgba(0,242,255,.45), 0 0 40px rgba(0,242,255,.18);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --texto:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--negro); color:var(--tinta);
+  font:17px/1.7 var(--texto); -webkit-font-smoothing:antialiased;
+}
+/* el cielo de puntos del panel, muy tenue y fijo */
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.5;
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, rgba(0,242,255,.35), transparent),
+    radial-gradient(1px 1px at 24% 72%, rgba(0,242,255,.3), transparent),
+    radial-gradient(1px 1px at 41% 28%, rgba(0,242,255,.28), transparent),
+    radial-gradient(1px 1px at 63% 84%, rgba(0,242,255,.26), transparent),
+    radial-gradient(1px 1px at 78% 18%, rgba(0,242,255,.3), transparent),
+    radial-gradient(1px 1px at 91% 58%, rgba(0,242,255,.22), transparent),
+    radial-gradient(1px 1px at 52% 52%, rgba(255,255,255,.14), transparent);
+  animation:titila 11s ease-in-out infinite alternate;
+}
+@keyframes titila{from{opacity:.28}to{opacity:.6}}
+
+/* ── barra de progreso de lectura: CSS puro ── */
+@keyframes crece{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.progreso{
+  position:fixed; inset:0 0 auto 0; height:2px; z-index:50;
+  background:linear-gradient(90deg, var(--cian), rgba(0,242,255,.25));
+  box-shadow:0 0 12px rgba(0,242,255,.8);
+  transform:scaleX(0); transform-origin:0 50%;
+  animation:crece linear both; animation-timeline:scroll(root);
+}
+
+/* ── cabecera pegada ── */
+.casa{
+  position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:1.2rem;
+  padding:.9rem clamp(1rem,4vw,2.4rem);
+  background:rgba(10,10,10,.86); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--linea);
+}
+.marca{
+  margin:0; display:flex; align-items:center; gap:.65rem;
+  font-family:var(--mono); font-size:.82rem; letter-spacing:.24em; text-transform:uppercase;
+}
+.marca a{color:var(--tinta); text-decoration:none}
+.marca a:hover{color:var(--cian); text-shadow:var(--brillo)}
+.marca .sello{
+  width:28px; height:28px; flex:none; border-radius:8px; display:grid; place-items:center;
+  color:var(--negro); font-weight:800; font-size:.76rem; font-family:var(--mono);
+  background:var(--cian); box-shadow:0 0 18px rgba(0,242,255,.6);
+}
+.lema{margin:0 0 0 auto; color:var(--apagado); font-size:.8rem; letter-spacing:.06em}
+.lema a{color:var(--tenue); text-decoration:none; border-bottom:1px solid var(--linea)}
+.lema a:hover{color:var(--cian)}
+
+/* ── columna ── */
+main.ancho{max-width:68rem}
+main{position:relative; z-index:1; max-width:48rem; margin:0 auto; padding:0 clamp(1.1rem,4vw,2rem) 5rem}
+
+/* ── portada del interior ── */
+.portada{padding:clamp(2.6rem,7vw,4.6rem) 0 2.4rem; border-bottom:1px solid var(--linea)}
+.portada .ojo{
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--cian); margin:0 0 1.1rem; text-shadow:0 0 16px rgba(0,242,255,.5);
+}
+.portada h1{
+  font-family:var(--serif); font-weight:600; letter-spacing:-.015em; line-height:1.1;
+  font-size:clamp(2rem,5.4vw,3.1rem); margin:0 0 1rem;
+}
+.portada .entrada{font-size:1.1rem; color:var(--tenue); margin:0; max-width:38rem}
+.datos{
+  display:flex; flex-wrap:wrap; gap:.4rem .9rem; margin:1.4rem 0 0; padding:0; list-style:none;
+  font-family:var(--mono); font-size:.72rem; color:var(--apagado); letter-spacing:.06em;
+}
+.datos li + li::before{content:"·"; margin-right:.9rem; color:var(--linea-fuerte)}
+
+/* ── artículos ── */
+article{padding-top:2.4rem}
+.cejilla{
+  display:flex; flex-wrap:wrap; gap:.5rem .9rem; align-items:center;
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--apagado); margin:0 0 1rem;
+}
+.cejilla .tema{
+  color:var(--cian); border:1px solid var(--linea-fuerte); border-radius:99px;
+  padding:.1rem .6rem; background:rgba(0,242,255,.06); box-shadow:0 0 12px rgba(0,242,255,.18);
+}
+article h1{
+  font-family:var(--serif); font-weight:600; letter-spacing:-.02em; line-height:1.1;
+  font-size:clamp(1.8rem,5vw,2.8rem); margin:0 0 1rem;
+}
+.entradilla{
+  font-size:1.12rem; line-height:1.6; color:var(--tenue); margin:0 0 2rem;
+  padding-bottom:1.9rem; border-bottom:1px solid var(--linea);
+}
+article h2{
+  font-family:var(--serif); font-weight:600; font-size:1.45rem; line-height:1.28; margin:2.9rem 0 .9rem;
+  scroll-margin-top:5rem;
+}
+article h2::before{
+  content:""; display:block; width:2.4rem; height:2px; margin-bottom:.7rem;
+  background:var(--cian); box-shadow:0 0 12px rgba(0,242,255,.8);
+}
+article h3{font-size:1.12rem; margin:1.9rem 0 .5rem; color:var(--tinta)}
+p{margin:0 0 1.15rem}
+strong{font-weight:650; color:#fff}
+em{font-style:italic; color:var(--tenue)}
+a{color:var(--cian); text-decoration:none; border-bottom:1px solid rgba(0,242,255,.3); transition:border-color .15s, text-shadow .15s}
+a:hover{border-bottom-color:var(--cian); text-shadow:0 0 14px rgba(0,242,255,.5)}
+
+/* cita */
+blockquote{
+  margin:1.7rem 0; padding:.95rem 1.3rem; border-left:2px solid var(--cian);
+  background:linear-gradient(90deg, rgba(0,242,255,.08), rgba(0,242,255,.01));
+  border-radius:0 10px 10px 0; font-family:var(--serif); font-size:1.08rem; line-height:1.55;
+  color:#dff6f8; box-shadow:inset 1px 0 0 rgba(0,242,255,.5);
+}
+blockquote p{margin:0}
+
+/* código */
+code{
+  font-family:var(--mono); font-size:.87em; background:rgba(0,242,255,.10);
+  color:#9df7ff; padding:.12em .38em; border-radius:5px; word-break:break-word;
+}
+pre{
+  margin:1.6rem 0; padding:1rem 1.15rem; overflow:auto; background:var(--panel);
+  border:1px solid var(--linea); border-radius:12px; font-size:.85rem; line-height:1.6;
+  box-shadow:0 0 30px rgba(0,242,255,.06), inset 0 0 0 1px rgba(0,0,0,.4);
+}
+pre code{background:none; color:#cdeff2; padding:0; font-size:1em}
+
+/* tablas: las cifras son el argumento */
+figure{margin:2rem 0}
+figcaption{font-family:var(--mono); font-size:.72rem; color:var(--apagado); margin-top:.6rem}
+.tabla{
+  overflow-x:auto; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
+  box-shadow:0 0 30px rgba(0,242,255,.06);
+}
+table{border-collapse:collapse; width:100%; font-size:.92rem; margin:1.6rem 0}
+.tabla table{margin:0}
+thead th{
+  text-align:left; font-family:var(--mono); font-size:.69rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--cian); font-weight:600; padding:.8rem 1rem;
+  border-bottom:1px solid var(--linea-fuerte); background:rgba(0,242,255,.05);
+}
+td,th{padding:.7rem 1rem; border-bottom:1px solid rgba(0,242,255,.08); vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(0,242,255,.06)}
+td code{font-size:.83em}
+
+/* dibujos */
+.dibujo{
+  margin:2.1rem 0; padding:1.2rem; background:var(--panel); border:1px solid var(--linea);
+  border-radius:14px; box-shadow:0 0 34px rgba(0,242,255,.07);
+}
+.dibujo svg{display:block; width:100%; height:auto}
+
+hr{border:0; border-top:1px solid var(--linea); margin:2.8rem 0}
+
+/* ── tarjetas del índice ── */
+.rejilla{display:grid; gap:1rem; margin:2.4rem 0 0; padding:0; list-style:none}
+@media (min-width:46rem){.rejilla{grid-template-columns:1fr 1fr}}
+.tarjeta{
+  position:relative; display:flex; flex-direction:column; gap:.55rem; padding:1.35rem 1.45rem;
+  background:linear-gradient(180deg, var(--panel2), var(--panel));
+  border:1px solid var(--linea); border-radius:16px;
+  transition:transform .18s, border-color .18s, box-shadow .18s;
+}
+.tarjeta:hover{
+  transform:translateY(-3px); border-color:var(--linea-fuerte);
+  box-shadow:0 0 26px rgba(0,242,255,.18), 0 14px 34px -22px rgba(0,0,0,.9);
+}
+.tarjeta .num{font-family:var(--mono); font-size:.7rem; color:var(--cian); letter-spacing:.18em}
+.tarjeta h2{font-family:var(--serif); font-size:1.16rem; line-height:1.28; margin:0; letter-spacing:-.01em}
+.tarjeta h2 a{color:var(--tinta); border:0}
+.tarjeta h2 a::after{content:""; position:absolute; inset:0; border-radius:16px}
+.tarjeta:hover h2 a{color:var(--cian)}
+.tarjeta .resumen{margin:0; color:var(--tenue); font-size:.9rem; line-height:1.55}
+.tarjeta .pie{
+  margin-top:auto; padding-top:.75rem; display:flex; gap:.8rem;
+  font-family:var(--mono); font-size:.69rem; color:var(--apagado); letter-spacing:.06em;
+}
+
+/* ── la ventana de preguntas: un chat de la casa ── */
+.chat{
+  margin:3.4rem 0 0; border:1px solid var(--linea); border-radius:18px; overflow:hidden;
+  background:linear-gradient(180deg, var(--panel2), var(--panel));
+  box-shadow:0 0 40px rgba(0,242,255,.08);
+}
+.chat .barra{
+  display:flex; align-items:center; gap:.6rem; padding:.75rem 1.1rem;
+  border-bottom:1px solid var(--linea); background:rgba(0,242,255,.05);
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--tenue);
+}
+.chat .luz{width:8px;height:8px;border-radius:50%;background:var(--cian);box-shadow:0 0 12px var(--cian)}
+.chat .cuerpo{padding:1.3rem 1.3rem .6rem; display:flex; flex-direction:column; gap:.9rem}
+.burbuja{
+  max-width:88%; padding:.85rem 1.05rem; border-radius:14px; font-size:.94rem; line-height:1.55;
+}
+.burbuja.ellos{
+  align-self:flex-start; background:rgba(255,255,255,.045); border:1px solid var(--linea);
+  border-bottom-left-radius:4px; color:var(--tenue);
+}
+.burbuja.yo{
+  align-self:flex-end; background:rgba(0,242,255,.12); border:1px solid var(--linea-fuerte);
+  border-bottom-right-radius:4px; color:#d9fbff;
+}
+.chat form{display:flex; gap:.6rem; padding:.9rem 1.3rem 1.2rem; border-top:1px solid var(--linea)}
+.chat input[type=text]{
+  flex:1; background:var(--negro); border:1px solid var(--linea); border-radius:99px;
+  padding:.8rem 1.1rem; color:var(--tinta); font:15px/1.4 var(--texto); outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+.chat input[type=text]::placeholder{color:var(--apagado)}
+.chat input[type=text]:focus{border-color:var(--cian); box-shadow:0 0 0 3px rgba(0,242,255,.12)}
+.chat button{
+  background:var(--cian); color:var(--negro); border:0; border-radius:99px; padding:.8rem 1.4rem;
+  font-family:var(--mono); font-size:.76rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700;
+  cursor:pointer; box-shadow:0 0 20px rgba(0,242,255,.45); transition:transform .15s, box-shadow .15s;
+}
+.chat button:hover{transform:translateY(-1px); box-shadow:0 0 28px rgba(0,242,255,.7)}
+.chat .nota{
+  margin:0; padding:0 1.3rem 1.1rem; font-size:.78rem; color:var(--apagado);
+}
+.chat .nota a{color:var(--tenue)}
+
+/* ── pie ── */
+footer{
+  margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--linea);
+  color:var(--apagado); font-size:.86rem;
+}
+footer p{margin:0 0 .6rem}
+footer .sello-pie{
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:#3d4d51;
+}
+
+/* ── vecinos ── */
+.vecinos{display:flex; gap:1rem; margin-top:2.8rem; flex-wrap:wrap}
+.vecinos a{
+  flex:1 1 14rem; padding:.95rem 1.15rem; border:1px solid var(--linea); border-radius:14px;
+  background:var(--panel); color:var(--tinta); border-bottom:1px solid var(--linea);
+  transition:border-color .15s, transform .15s, box-shadow .15s;
+}
+.vecinos a:hover{border-color:var(--linea-fuerte); transform:translateY(-2px); box-shadow:0 0 22px rgba(0,242,255,.15); text-shadow:none}
+.vecinos .rotulo{
+  display:block; font-family:var(--mono); font-size:.68rem; color:var(--apagado);
+  text-transform:uppercase; letter-spacing:.16em; margin-bottom:.3rem;
+}
+
+@media (max-width:32rem){
+  body{font-size:16px}
+  .lema{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important; transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="progreso" aria-hidden="true"></div>
+<header class="casa">
+<p class="marca"><svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0a458"/><stop offset="1" stop-color="#b45309"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#g)"/><path d="M8 22V10h3v9h5v3H8zm9 0V10h7v3h-4v9h-3z" fill="#fff"/></svg><a href="temas.html">El Taller</a></p>
+<p class="lema"><a href="index.html">Portada</a> · <strong>medido en casa</strong>, cifras con fecha y comando</p>
+</header>
+<main>
+<article>
+<p class="cejilla"><span class="tema">entrenamiento</span><span>2026-11-22</span><span>6 min de lectura</span></p>
+<h1>Nuestro modelo aprendió castellano en 1,09 bits por carácter; la etapa que iba a enseñarle nuestra voz lo dejó en 3,77</h1>
+<p class="entradilla">Entrenamos desde cero un modelo de 74,7 millones de parámetros — arquitectura, tokenizador y datos propios —. Aprendió castellano con 1,09 bits por carácter. La etapa final, la que iba a meterle nuestra forma de escribir, multiplicó la perplejidad por 246. Y la cifra que decidía de verdad llevaba semanas delante de nosotros: un examen de 20 preguntas.</p>
+<p>Este artículo va de un modelo que construimos entero, de la cifra que nos hizo creer que iba bien, y de la cifra que decía la verdad y que tardamos en mirar.</p>
+<p>No hay nada aquí que no esté en un registro de entrenamiento con su fecha. Los números salen de las fichas que escribió cada corrida: cada ficha guarda los pasos, los tokens vistos, la pérdida de validación y los bits por carácter. Nada de esto es una impresión.</p>
+<h2>Lo que se construyó</h2>
+<p>Sin descargar un solo peso. Arquitectura escrita aquí, tokenizador entrenado aquí, y el corpus montado a mano. El bicho, leído del checkpoint y no de la memoria:</p>
+<pre><code>74.771.200 parámetros · 12 capas · d=640 · 10 cabezas
+MLP denso de 2.560 · contexto 512 · vocabulario 24.000
+cabeza de salida ATADA a la tabla de palabras
+149 tensores · denso, sin expertos ni enrutador
+</code></pre>
+<p>Dos detalles que costaron su rato y que conviene contar, porque son los que uno se salta:</p>
+<p><strong>La cabeza atada.</strong> El tensor de entrada y el de salida son el mismo. Cuando alguien suma el <code>state_dict</code> a mano le salen <strong>90.131.200</strong> parámetros, y son mentira: los 15.360.000 de la tabla (<code>24.000 × 640</code>) están contados dos veces. Los de verdad son <strong>74.771.200</strong>. Cualquiera que copie el número del <code>state_dict</code> está publicando un modelo un 20 % más grande del que tiene.</p>
+<p><strong>La unidad de medida.</strong> No usamos perplejidad para comparar entre etapas. La perplejidad no se puede comparar entre tokenizadores distintos, y aquí había dos. La unidad fue <strong>bits por carácter</strong>, que sí se compara. Esa decisión nos salvó de una confusión y nos metió en otra que cuento más abajo.</p>
+<p><strong>Y un tokenizador propio de 24.000 piezas.</strong> Eso significa que las cifras de este artículo no son comparables con las de ningún modelo de fuera: nadie más parte el texto igual.</p>
+<h2>Cómo se entrenó: dos etapas y una proporción</h2>
+<ul>
+<li><strong>Etapa 1 — el idioma.</strong> <strong>1.189.642.240 tokens</strong> de castellano público: 1.574.713 documentos, 5,20 GB, licencia abierta, filtrados entre 400 y 120.000 caracteres. 72.610 pasos. Tardó <strong>17.022 segundos</strong> (4 h 44 min).</li>
+<li><strong>Etapa 2 — nuestra voz.</strong> <strong>4.968.943 tokens</strong> de material propio: conversaciones, actas, notas de trabajo.</li>
+</ul>
+<p>La proporción, y este es el dato que hay que mirar dos veces: <strong>la etapa nuestra era el 0,42 % de todo lo que el modelo vio</strong>. Cuatro mil novecientos sesenta y ocho mil tokens frente a mil ciento noventa millones.</p>
+<p>Un modelo de 74,7 millones de parámetros pide alrededor de <strong>1.495 millones de tokens</strong> para aprender bien, a razón de unos 20 por parámetro. Teníamos <strong>4.968.943</strong> tokens de material propio. Faltaban <strong>300 veces</strong>.</p>
+<p>Ese diagnóstico — faltan datos nuestros, no pericia — lo escribimos y lo sostuvimos. Y era verdad a medias, que es la peor clase de verdad.</p>
+<h2>Los tres números</h2>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>etapa</th>
+<th>pasos</th>
+<th>tokens vistos</th>
+<th>pérdida val.</th>
+<th>bits/carácter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>castellano público</td>
+<td>72.610</td>
+<td>1.189.642.240</td>
+<td>3,3662</td>
+<td><strong>1,0947</strong></td>
+</tr>
+<tr>
+<td>+ nuestra etapa</td>
+<td>1.425</td>
+<td>23.347.200</td>
+<td>8,8735</td>
+<td><strong>3,7687</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>El modelo aprendió castellano.</strong> 1,09 bits por carácter es un texto que se lee: sujeto, verbo, concordancia, párrafos que empiezan y acaban. Para un modelo de 74 millones entrenado cuatro horas en una máquina de casa, eso está bien y no hace falta adornarlo.</p>
+<p><strong>Y la etapa nuestra lo destrozó.</strong> De 1,09 a 3,77 bits por carácter. La perplejidad pasó de <strong>28,97 a 7.140,36</strong>: multiplicada por <strong>246</strong>.</p>
+<p>La etapa que existía para enseñarle nuestra forma de escribir fue la que le hizo olvidar cómo se escribe.</p>
+<h2>Lo que creímos entonces, y lo que era</h2>
+<p>La explicación que nos dimos fue la de los datos: faltaban trescientas veces. Y con esa explicación se cerró el capítulo del modelo, con un número delante.</p>
+<p>Es una explicación razonable y no la retiro, pero no es la que explica ese salto. Un corpus pequeño y bien elegido <strong>afina</strong> un modelo; no lo convierte en ruido. Lo que hace ruido es repetir ese corpus pequeño muchas veces encima de uno grande: cinco épocas sobre el 0,42 % no enseñan la voz, borran el idioma. Es el viejo olvido catastrófico, y aquí se vio con una claridad que casi da pena.</p>
+<p>¿Por qué no lo medimos como tal? Porque para eso estaba el <strong>gemelo</strong>: una copia de los pesos justo antes de la etapa nuestra, el mismo modelo sin haber visto ni una línea de lo propio. La comparación honesta era <strong>A → B</strong>: el gemelo contra el afinado. Y no contra un modelo de fuera cuatrocientas cuarenta y cuatro veces más grande, que es una comparación que no dice nada y queda muy bien en una tabla.</p>
+<p>El gemelo se guardó. La comparación, no la hicimos con el rigor que habíamos escrito. Eso también hay que decirlo.</p>
+<h2>Una veintena de corridas más, y la trampa otra vez</h2>
+<p>Después de aquello no nos quedamos quietos. Hay <strong>veinticinco fichas</strong> de entrenamiento guardadas, y casi todas son intentos de arreglar la etapa nuestra: más épocas, menos épocas, otra tasa de aprendizaje, pares de pregunta y respuesta en vez de prosa, la duda sobrepesada para que el modelo aprendiera a decir «no lo sé» en vez de inventar.</p>
+<p>Y funcionó, en el sentido de que los números mejoraron:</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th>corrida</th>
+<th>pérdida val.</th>
+<th>bits/carácter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>la que se rompió</td>
+<td>8,8735</td>
+<td>3,7687</td>
+</tr>
+<tr>
+<td>la misma etapa con más tokens propios</td>
+<td>4,6730</td>
+<td>1,98</td>
+</tr>
+<tr>
+<td>la mejor corrida afinada</td>
+<td>3,2792</td>
+<td>1,36</td>
+</tr>
+</tbody>
+</table></div>
+<p>De 3,77 a 1,36 bits por carácter. Sobre el papel, la etapa nuestra dejó de romperlo: el modelo volvía a escribir castellano.</p>
+<p><strong>Y no sabía nada.</strong> Llegó el examen, veinte preguntas cuya respuesta no estaba copiada en ningún sitio, y el mejor modelo salió con <strong>3 aciertos de 20</strong>.</p>
+<h2>La cifra que decidía estaba delante desde el primer día</h2>
+<p>El examen no lo inventamos después. Existía desde antes de entrenar: <strong>veinte preguntas con su respuesta esperada y una tercera columna para las invenciones</strong> — porque un modelo que acierta doce veces inventando seis no es mejor que uno que acierta tres y se calla nueve.</p>
+<p>La vara estaba puesta en <strong>12 aciertos de 20, 33 puntos de 55 y cero invenciones</strong>.</p>
+<div class="tabla"><table>
+<thead>
+<tr>
+<th></th>
+<th>aciertos</th>
+<th>puntos</th>
+<th>invenciones</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>la vara</td>
+<td>12/20</td>
+<td>33/55</td>
+<td>0</td>
+</tr>
+<tr>
+<td>el mejor modelo construido aquí</td>
+<td><strong>3/20</strong></td>
+<td>9/55</td>
+<td>—</td>
+</tr>
+<tr>
+<td>el más honesto (no inventa y se calla)</td>
+<td>2/20</td>
+<td>6/55</td>
+<td><strong>0</strong>, con 9 «no lo sé»</td>
+</tr>
+</tbody>
+</table></div>
+<p>Tres de veinte. Y el más honesto, dos, con nueve negativas limpias: un modelo que no inventa porque apenas habla.</p>
+<p>Y aquí está lo que de verdad enseñó este experimento, más que cualquier pérdida: <strong>con el mismo corpus escaso, el índice de búsqueda —un buscador, no un modelo— llegaba a 11 aciertos de 20.</strong> El material no daba para un modelo de lenguaje. Daba para un buscador. Elegimos el instrumento equivocado para el material que había, y lo elegimos con los ojos abiertos porque construir un modelo hace más ilusión que montar un índice.</p>
+<h2>La moraleja, que es sobre medir y no sobre modelos</h2>
+<p>La pérdida de validación mide <strong>cuánto se parece el texto que sale al texto que entró</strong>. No mide si el modelo sabe algo. Un modelo puede bajar a 1,09 bits por carácter y no saber dónde está, ni qué es una nómina, ni cuándo tiene que decir «no lo sé».</p>
+<p>Nosotros teníamos la cifra buena —el examen— escrita desde el principio, y miramos la otra durante semanas porque la otra mejoraba. Es exactamente el mismo error que ya habíamos cometido antes en este taller con otra bandera: medir con la varita que sube en vez de con la que decide.</p>
+<p>Lo que queda de todo aquello no son los pesos. <strong>Los pesos se perdieron</strong>; lo que hay son las fichas: veinticinco ficheros de unos cuatrocientos bytes con los pasos, los tokens, la pérdida y los bits por carácter, y los dos tokenizadores. La ficha sobrevivió al modelo.</p>
+<p>Y eso, para un taller que publica lo que mide, es la lección de verdad: <strong>lo que no se escribe, no existe — y una cifra sin su examen es una cifra que miente con la cara seria.</strong></p>
+</article>
+<nav class="vecinos">
+<a href="06-hubo-un-hilo-y-nos-corrigieron.html"><span class="rotulo">Anterior</span>Hubo un hilo, y nos corrigieron dos veces</a>
+</nav>
+<footer>
+<p>Todo lo que hay aquí se ha medido en una máquina concreta y se puede repetir. Cuando no se pudo medir,
+se dice. Los números llevan su fecha y su comando.</p>
+<p>Texto bajo <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a>.</p>
+<p class="sello-pie">El Taller de DanteHef · taller.dantehef.dev</p>
+</footer>
+</main>
+</body>
+</html>
