@@ -11,7 +11,7 @@
 
 El cuaderno público de la casa: **medidas, pruebas y lo que se rompe**, con el número, la fecha y el comando al lado. **Ningún número sin su fichero de resultados.** Lo que no se ha podido medir, se dice.
 
-- **Vive en:** `~/Imperio_Escritos` (esto es todo el producto; no hay nada fuera salvo el respaldo y los registros).
+- **Vive en:** esta carpeta (esto es todo el producto; no hay nada fuera salvo el respaldo y los registros).
 - **Se ve en:** `https://taller.dantehef.dev` (GitHub Pages, repo `pedrow012-svg/el-taller`).
 - **Espejo:** `github.com/pedrow012-svg/taller-nuevo` → `pedrow012-svg.github.io/taller-nuevo/`, **marcado `noindex` + `canonical` al dominio**. Una casa, una puerta: el dominio.
 - **Tecnología:** `construye.py` (Python + `markdown`), HTML estático, **cero JavaScript, cero fuentes externas, cero dependencias de red en el navegador**.
@@ -34,9 +34,9 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 |---|---|---|
 | `salud.sh` | 8 comprobaciones: repo limpio y empujado · el `sitio/` corresponde a los `.md` (reconstruye en copia y compara byte a byte) · cada HTML con su `canonical`/`og`/JSON-LD · **cada página EN VIVO byte a byte igual a la local** · `sitemap.xml` con tantas URL como páginas · `robots.txt` · el espejo con `noindex` · días de certificado TLS | a mano, y antes de publicar (`--solo-local`) |
 | `publica.sh "mensaje"` | construye · pasa `salud.sh --solo-local` · commit · push · **espera a que el dominio sirva exactamente lo local** · dice qué hacer si no | cada vez que hay algo nuevo |
-| `respaldo.sh` | `git bundle` verificado (`git bundle verify`) a `~/.imperio/backups/taller_web/`, guarda los 6 últimos, y comprueba que el remoto tiene todo | cada semana y antes de un cambio gordo |
+| `respaldo.sh` | `git bundle` verificado (`git bundle verify`) a la carpeta de respaldos del taller, guarda los 6 últimos, y comprueba que el remoto tiene todo | cada semana y antes de un cambio gordo |
 
-**Registro de todo:** `~/.imperio/logs/taller_web.log`.
+**Registro de todo:** el registro del taller.
 
 ## ④ DE QUÉ RESPONDO Y DE QUÉ NO
 
@@ -59,7 +59,7 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 3. **Si el dominio sirve algo viejo:** es la caché de Pages; se fuerza reconstruyendo y empujando un commit vacío (`git commit --allow-empty`).
 4. **Si el `sitio/` no corresponde a los `.md`:** `python3 construye.py` y volver a publicar. `salud.sh` lo detecta antes que nadie porque reconstruye en copia.
 5. **Si me he equivocado publicando:** `git revert <commit>` (nunca `reset --hard` sobre algo ya publicado) y se vuelve a publicar; el historial queda, que es lo honesto.
-6. **Si el repo desapareciera:** `git clone ~/.imperio/backups/taller_web/taller_<fecha>.bundle taller_restaurado` — el bundle trae la historia entera.
+6. **Si el repo desapareciera:** `git clone los registros del taller taller_restaurado` — el bundle trae la historia entera.
 
 ## ⑦ LO QUE ESTÁ ABIERTO, Y ES DE PEDRO
 
@@ -87,7 +87,7 @@ taller-web.service  → corre salud.sh entero y lo deja en el journal
 - **Probado el `19-11` a las 19:37:** disparado a mano, **código 0 · 11 comprobaciones en verde**, y la última línea del journal dice «Finished taller-web.service».
 - **Mirar lo que vio:** `journalctl --user -u taller-web.service -n 30`
 - **Quitarlo:** `systemctl --user disable --now taller-web.timer`
-- **Y su límite:** el reloj **no arregla nada solo**; avisa en el journal y deja la huella en `~/.imperio/logs/taller_web.log`. **La mano que repara es la mía, cuando abro turno y leo el registro. No se le promete a Pedro un aviso al móvil que este reloj no da.**
+- **Y su límite:** el reloj **no arregla nada solo**; avisa en el journal y deja la huella en el registro del taller. **La mano que repara es la mía, cuando abro turno y leo el registro. No se le promete a Pedro un aviso al móvil que este reloj no da.**
 
 ## ⑩ EL INCIDENTE DEL `19-11`, ESCRITO PARA QUE NO SE REPITA
 
@@ -95,11 +95,11 @@ taller-web.service  → corre salud.sh entero y lo deja en el journal
 
 **Y el daño, medido y pequeño:** **el sitio no cambió ni un byte.** Las dos primeras fueron herramientas y la ficha; la tercera, un párrafo de la ficha. `sitio/` sigue igual que en `a36f405`, y `salud.sh` lo confirma con el sha256 del dominio. **Lo que se rompió fue el procedimiento, no el producto** — y aun así se apunta, porque un procedimiento que se salta tres veces en una tarde no es un descuido: es que estaba mal puesto.
 
-**⇒ LA LECCIÓN, y es de diseño:** ***una puerta dentro de lo que custodia se puede saltar.*** **La puerta de dos tiempos vive ahora FUERA del repo**, en `~/scripts/taller.sh`, y el repo sólo guarda una copia que señala dónde está. Así no hay estado del repositorio que pueda reabrir la puerta vieja.
+**⇒ LA LECCIÓN, y es de diseño:** ***una puerta dentro de lo que custodia se puede saltar.*** **La puerta de dos tiempos vive ahora FUERA del repo**, en `los bancos del taller`, y el repo sólo guarda una copia que señala dónde está. Así no hay estado del repositorio que pueda reabrir la puerta vieja.
 
 ```
-bash ~/scripts/taller.sh propone "mensaje"     ← rama + PR + vista previa. main no se toca.
-bash ~/scripts/taller.sh cierra <PR> --visto "quien construye (...) + quien decide (...)"
+bash los bancos del taller propone "mensaje"     ← rama + PR + vista previa. main no se toca.
+bash los bancos del taller cierra <PR> --visto "quien construye (...) + quien decide (...)"
 ```
 
 ---

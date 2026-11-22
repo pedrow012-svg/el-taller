@@ -317,7 +317,7 @@ las sacó, y lo que se rompió por el camino. Cuando algo no se pudo medir, aqu�
 </section>
 <ul class="rejilla">
 <li class="tarjeta"><span class="num">06</span><h2><a href="06-hubo-un-hilo-y-nos-corrigieron.html">Hubo un hilo, y nos corrigieron dos veces</a></h2><p class="resumen">El artículo anterior cuenta lo que medimos. Este cuenta cómo llegamos a medirlo: un issue que abrimos el 18-11 convencidos de un fallo, un colaborador de Ollama que nos contestó dos veces, y una corrección nuestra que nos hicimos nosotros mismos al día siguiente. Incluye la cifra que retiramos y las dos preguntas que siguen sin respuesta.</p><p class="pie"><span>2026-11-19</span><span>4 min</span></p></li>
-<li class="tarjeta"><span class="num">05</span><h2><a href="05-el-parche-que-arregla-dos-y-estropea-dos.html">El parche que arregla dos casos y estropea otros dos: leer el razonamiento como si fuera la respuesta</a></h2><p class="resumen">Un banco leía el campo equivocado y llamaba vacío lo que el modelo sí contestó. Al arreglarlo, dos casos mejoraron y dos empezaron a fallar por otro motivo: ahora el test lee el proceso de pensar y lo cuenta como respuesta. Con los dos registros delante, no con impresiones.</p><p class="pie"><span>2026-11-19</span><span>8 min</span></p></li>
+<li class="tarjeta"><span class="num">05</span><h2><a href="05-el-parche-que-arregla-dos-y-estropea-dos.html">El parche que arregla dos casos y estropea otros dos: leer el razonamiento como si fuera la respuesta</a></h2><p class="resumen">Un banco leía el campo equivocado y llamaba vacío lo que el modelo sí contestó. Al arreglarlo, dos casos mejoraron y dos empezaron a fallar por otro motivo: ahora el test lee el proceso de pensar y lo cuenta como respuesta. Con los dos registros delante, no con impresiones.</p><p class="pie"><span>2026-11-19</span><span>11 min</span></p></li>
 <li class="tarjeta"><span class="num">01</span><h2><a href="01-ollama-truncado-silencioso.html">Ollama tira media ventana de contexto cuando trunca, y no dice cuánto tiró</a></h2><p class="resumen">Cuatro combinaciones de versión y configuración y las cuatro dan el mismo número. Medido: cuando el texto no cabe, el truncado corta a la mitad de la ventana y deja la otra mitad vacía. Con 16.384 tokens te quedas con 8.192. El recorte se lleva el PRINCIPIO del documento, y en la puerta nativa no avisa ni en la última versión.</p><p class="pie"><span>2026-11-19</span><span>8 min</span></p></li>
 <li class="tarjeta"><span class="num">04</span><h2><a href="04-archivo-de-lo-comun.html">El archivo de lo común existe. Y el modelo distingue mucho peor un eccema que un tumor</a></h2><p class="resumen">3.061 casos con diagnóstico de dermatólogo, de enfermedades comunes. Medidos con el mismo motor de nuestro visor: 42 % de acierto al primer parecido, frente al 77 % en lesiones tumorales.</p><p class="pie"><span>2026-11-17</span><span>7 min</span></p></li>
 <li class="tarjeta"><span class="num">03</span><h2><a href="03-el-mejor-modelo-que-tiramos.html">El modelo que dimos por malo era el mejor. Lo medí con la bandera equivocada</a></h2><p class="resumen">Le pusimos 36/48 y lo descartamos. Con el razonamiento encendido y otro motor da 45/48 y va al doble de velocidad. Tres veces el mismo error en un día.</p><p class="pie"><span>2026-11-17</span><span>3 min</span></p></li>
@@ -331,12 +331,9 @@ qué máquina era, o qué crees que medimos mal. Si la pregunta tiene respuesta 
 <div class="burbuja yo">¿Y si quiero que se repita una prueba con otro modelo?</div>
 <div class="burbuja ellos">Se pide y se prueba, si la máquina está libre. Lo que no se hace es prometer un número antes de medirlo.</div>
 </div>
-<form action="mailto:pedrow012@gmail.com" method="post" enctype="text/plain">
-<input type="text" name="pregunta" placeholder="Escribe tu pregunta…" aria-label="Tu pregunta" required>
-<button type="submit">Enviar</button>
-</form>
-<p class="nota">El botón abre tu programa de correo con la pregunta escrita: aquí no hay servidor ni cuentas,
-y por eso no se finge una conversación en vivo. <a href="https://github.com/pedrow012-svg/el-taller/issues">También se puede dejar en el registro público del taller.</a></p>
+<p style="margin:1.4rem 0"><a class="boton" style="display:inline-block;padding:.7rem 1.3rem;border:2px solid currentColor;border-radius:.4rem;text-decoration:none;font-weight:700" href="https://github.com/pedrow012-svg/el-taller/issues">Dejar la pregunta en el registro público del taller</a></p>
+<p class="nota">Aquí no hay servidor ni cuentas, y no hay correo detrás: la pregunta se deja en el registro
+público del taller, a la vista de todos, y se contesta ahí mismo. Por eso no se finge una conversación en vivo.</p>
 </section>
 <footer>
 <p>Todo lo que hay aquí se ha medido en una máquina concreta y se puede repetir. Cuando no se pudo medir,
