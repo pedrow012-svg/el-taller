@@ -93,12 +93,9 @@ qué máquina era, o qué crees que medimos mal. Si la pregunta tiene respuesta 
 <div class="burbuja yo">¿Y si quiero que se repita una prueba con otro modelo?</div>
 <div class="burbuja ellos">Se pide y se prueba, si la máquina está libre. Lo que no se hace es prometer un número antes de medirlo.</div>
 </div>
-<form action="mailto:pedrow012@gmail.com" method="post" enctype="text/plain">
-<input type="text" name="pregunta" placeholder="Escribe tu pregunta…" aria-label="Tu pregunta" required>
-<button type="submit">Enviar</button>
-</form>
-<p class="nota">El botón abre tu programa de correo con la pregunta escrita: aquí no hay servidor ni cuentas,
-y por eso no se finge una conversación en vivo. <a href="https://github.com/pedrow012-svg/el-taller/issues">También se puede dejar en el registro público del taller.</a></p>
+<p style="margin:1.4rem 0"><a class="boton" style="display:inline-block;padding:.7rem 1.3rem;border:2px solid currentColor;border-radius:.4rem;text-decoration:none;font-weight:700" href="https://github.com/pedrow012-svg/el-taller/issues">Dejar la pregunta en el registro público del taller</a></p>
+<p class="nota">Aquí no hay servidor ni cuentas, y no hay correo detrás: la pregunta se deja en el registro
+público del taller, a la vista de todos, y se contesta ahí mismo. Por eso no se finge una conversación en vivo.</p>
 </section>"""
 
 

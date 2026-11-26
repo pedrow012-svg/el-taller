@@ -49,11 +49,11 @@ Y luego el texto. **Regla de la casa:** ningún número sin su fichero de result
 **Regla del proyecto (`19-11-2026`):** ***nada se publica sin que lo hayan visto antes dos personas distintas — quien construye no se aprueba a sí mismo. La revisión se hace en la vista previa y en GitHub.***
 
 ```sh
-bash ~/scripts/taller.sh propone "mensaje"      # rama + PR + vista previa. main NO se toca.
-bash ~/scripts/taller.sh cierra <PR> --visto "quien construye (...) + quien decide (...)"
+bash taller.sh propone "mensaje"      # rama + PR + vista previa. main NO se toca.
+bash taller.sh cierra <PR> --visto "quien construye (...) + quien decide (...)"
 ```
 
-**La puerta vive fuera del repo (`~/scripts/taller.sh`) a propósito:** una puerta dentro de lo que custodia
+**La puerta vive fuera del repo, a propósito:** una puerta dentro de lo que custodia
 se puede saltar. La copia `publica.sh` de este repo sólo dice dónde está la buena.
 
 ## Las piezas que lo mantienen
@@ -61,7 +61,7 @@ se puede saltar. La copia `publica.sh` de este repo sólo dice dónde está la b
 - `salud.sh` — 11 comprobaciones: repo, que el `sitio/` corresponda a los `.md` (reconstruye en copia y compara
   byte a byte), cada página **en vivo** con el mismo sha256 que la local, `sitemap`, `robots`, el `noindex` del
   espejo y los días de TLS.
-- `respaldo.sh` — `git bundle` verificado por git y **probado restaurándolo**, a `~/.imperio/backups/taller_web/`.
+- `respaldo.sh` — `git bundle` verificado por git y **probado restaurándolo**, a la carpeta de respaldos del taller.
 - `taller-web.timer` — cada mañana a las 08:10 corre `salud.sh` y lo deja en el journal.
 
 **La ficha entera, con lo que es mío y lo que no:** [`FICHA.md`](FICHA.md).

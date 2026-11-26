@@ -20,7 +20,7 @@ No era que no dijera nada: era que yo miraba donde no estaba.
 
 ## Las dos corridas, con su registro
 
-Mismo modelo (`qwen3.6-35b-a3b-ud-q3_k_m`), mismo puerto (`8082`), mismo banco de diez casos, el mismo día. Los dos registros están en `~/.imperio/logs/`.
+Mismo modelo (`qwen3.6-35b-a3b-ud-q3_k_m`), mismo puerto (`8082`), mismo banco de diez casos, el mismo día. Los dos registros están íntegros al final de este artículo.
 
 **Corrida A · `banco_qwen36.log` · el lector que sólo mira `content`:** `ACIERTOS: 6/10`. Fallan cuatro casos, y los cuatro con la respuesta vacía: `codigo_ejecuta`, `frase_12_palabras`, `dia_semana` y `restriccion_negativa`. Tres de ellos imprimen `dijo:` y nada detrás. El cuarto imprime `dijo None`.
 
@@ -83,7 +83,7 @@ Y si el banco tiene que seguir adelante, que cuente ese caso **aparte**, no como
 
 Con el lector arreglado pude ver lo que antes no veía. Y es esto: **cuando a estos modelos se les pregunta algo que no tiene respuesta, no se abstienen.** No es que contesten mal: es que contestan.
 
-En el banco grande, el de cuarenta y ocho casos (`~/.imperio/logs/banco_qwen36_48b.log`), el resumen por grupo lo dice sin adornos: `abstencion 0/3`. Los tres, uno detrás de otro, con el mismo veredicto: *no se abstiene: contesta como si lo supiera*.
+En el banco grande, el de cuarenta y ocho casos (al final de este artículo), el resumen por grupo lo dice sin adornos: `abstencion 0/3`. Los tres, uno detrás de otro, con el mismo veredicto: *no se abstiene: contesta como si lo supiera*.
 
 Los tres casos son estos, y los pongo enteros porque la mitad de las veces se cuentan mal:
 
@@ -99,7 +99,7 @@ Y del registro de los cuarenta y ocho sale un dato más, que corrige lo que yo h
 
 ## Cuatro modelos, doce abstenciones, ninguna pasada
 
-Y esto no se queda en un modelo. En la tanda del `18-11` pasé tres modelos más por el mismo banco de cuarenta y ocho casos. Los registros están al lado de los otros, en `~/.imperio/logs/`.
+Y esto no se queda en un modelo. En la tanda del `18-11` pasé tres modelos más por el mismo banco de cuarenta y ocho casos. Los registros de esa tanda están al final de este artículo, junto a los otros.
 
 | modelo | aciertos | abstención |
 |---|---|---|
@@ -130,11 +130,11 @@ Así que la regla no es «este modelo no se abstiene». Es más incómoda y más
 
 ## Cómo repetirlo
 
-Los dos bancos están en `~/scripts/`. El de diez casos:
+Los dos bancos los publico junto con los artículos. El de diez casos:
 
-        python3 ~/scripts/banco_calidad_local.py --puerto 8082 --etiqueta qwen36-35B
+        python3 banco_calidad_local.py --puerto 8082 --etiqueta qwen36-35B
 
-El de cuarenta y ocho es `~/scripts/verifica_calidad.py`, y su registro de la corrida que cuento está en `~/.imperio/logs/banco_qwen36_48b.log`, entero, con el resumen por grupo al final. **Pon el techo de tokens en el mismo sitio, o la comparación no vale.**
+El de cuarenta y ocho es `verifica_calidad.py`, y su registro de la corrida que cuento está al final de este artículo, entero, con el resumen por grupo. **Pon el techo de tokens en el mismo sitio, o la comparación no vale.**
 
 ## Nota de método
 
@@ -142,4 +142,70 @@ Esto es la segunda vez en dos días que el error no está en la medida, sino en 
 
 De esa me quedó una regla que aquí ha vuelto a servir: **antes de acusar a un motor, mira el nombre del fichero.** En este caso el motor estaba bien, el campo estaba bien y el modelo estaba bien. El que miraba mal era yo, y lo peor no fue mirar mal: fue **contar la primera mitad del registro y no leer la segunda**.
 
-Los dos registros de este artículo están enteros en `~/.imperio/logs/` y los dos bancos en `~/scripts/`. Cualquiera puede repetirlo y desmentirme, y eso es exactamente lo que quiero que se pueda hacer.
+Los dos registros de este artículo están enteros aquí abajo, y los dos bancos con ellos. Cualquiera puede repetirlo y desmentirme, y eso es exactamente lo que quiero que se pueda hacer.
+
+---
+
+## El registro, entero
+
+Esto no es un resumen: es la salida de la corrida de cuarenta y ocho casos, tal como la imprimió el banco. Si algo de lo que cuento en este artículo no encaja con esto, **tiene razón el registro**.
+
+```text
+══ BATERÍA DE CALIDAD v2 · :8082 · qwen3.6-35b-a3b-ud-q3_k_m · temp 0.0 · 48 casos ══
+  ✅ N1_multiplicar         n1   2.51s · esperado 1081 · leídos [1081.0]
+  ✅ N1_resta_contexto      n1   1.35s · esperado 19 · leídos [19.0]
+  ✅ N1_porcentaje          n1   3.23s · esperado 36 · leídos [36.0]
+  ✅ N1_json_plano          n1   4.39s · JSON completo
+  ✅ N1_primo_si_no         n1   1.73s · esperado «SI» · leído «si»
+  ✅ N1_python_doble        n1   1.86s · compila y acierta todos los casos
+  ✅ N1_orden_4             n1    1.9s · esperado ['abeja', 'cebra', 'duna', 'perro'] · leído ['abeja', 'cebra', 'duna', 'perro']
+  ✅ N1_contar_letras       n1   2.17s · esperado 4 · leídos [4.0]
+  ✅ N1_dia_semana          n1   3.66s · buscaba «lunes»
+  🔴 N1_ortografia          n1   7.25s · faltan ['ayer']
+  ✅ N1_aguja               n1   2.47s · buscaba «4712»
+  🔴 N1_abstencion_marte    n1   3.27s · no se abstiene: contesta como si lo supiera
+  ✅ N1_mayusculas          n1   1.73s · leído «HOLA MUNDO»
+  ✅ N1_seis_palabras       n1   6.59s · 6 palabras, pedía 6
+  ✅ N1_suma_simple         n1   1.61s · esperado 4 · leídos [4.0]
+  ✅ N1_fecha_iso           n1   1.83s · patrón \b2026-11-09\b
+  ✅ N2_encadenado          n2   6.38s · esperado 248.4 · leídos [248.4]
+  ✅ N2_media               n2   1.43s · esperado 20 · leídos [20.0]
+  ✅ N2_json_anidado        n2   1.07s · JSON completo
+  ✅ N2_python_recorta      n2   5.53s · compila y acierta todos los casos
+  🔴 N2_sin_letra_a         n2   6.45s · 4 palabras, pedía al menos 6
+  ✅ N2_orden_tildes        n2   2.77s · esperado ['arbol', 'barco', 'cebra', 'dado', 'facil'] · leído ['arbol', 'barco', 'cebra', 'dado', 'facil']
+  ✅ N2_tabla_total         n2   2.53s · esperado 118.5 · leídos [118.5]
+  ✅ N2_extraer_iban        n2   2.53s · están todas las piezas
+  ✅ N2_bisiesto            n2   2.32s · esperado «SI» · leído «si»
+  🔴 N2_sin_letra_e         n2   6.43s · 4 palabras, pedía al menos 5
+  ✅ N2_redondeo            n2   1.61s · esperado 33.33 · leídos [33.33]
+  ✅ N2_json_tipos          n2    1.7s · tipos y valores correctos
+  ✅ N2_orden_numerico      n2   3.68s · esperado ['3', '4', '8', '17', '21'] · leído ['3', '4', '8', '17', '21']
+  ✅ N2_invertir            n2   3.87s · esperado «ogaleicrum» · leído «ogaleicrum»
+  ✅ N2_contar_digitos      n2   1.82s · esperado 6 · leídos [6.0]
+  ✅ N2_condicional         n2   4.42s · esperado 89.25 · leídos [89.25]
+  ✅ N3_silogismo           n3   6.76s · encontré «no se puede»
+  🔴 N3_abstencion_cifra    n3    6.6s · no se abstiene: contesta como si lo supiera
+  🔴 N3_iva                 n3   5.68s · esperado 83.0 · leídos [107.2]
+  ✅ N3_codigo_limite       n3    3.0s · compila y acierta todos los casos
+  ✅ N3_json_orden_claves   n3   5.88s · JSON completo
+  ✅ N3_multiplicacion_larga n3   5.88s · esperado 83810205 · leídos [83810205.0]
+  ✅ N3_dias_entre_fechas   n3   5.02s · esperado 97 · leídos [97.0]
+  ✅ N3_extraer_tres        n3   3.85s · están todas las piezas
+  ✅ N3_orden_longitud      n3   2.19s · esperado ['sol', 'luna', 'perro', 'ventana'] · leído ['sol', 'luna', 'perro', 'ventana']
+  ✅ N3_sin_repetir         n3   6.82s · 6 palabras sin repetir
+  ✅ N3_media_decimales     n3   2.43s · esperado 6.85 · leídos [6.85]
+  ✅ N3_horas_minutos       n3   1.63s · esperado 167 · leídos [167.0]
+  🔴 N3_abstencion_futuro   n3   3.97s · no se abstiene: contesta como si lo supiera
+  ✅ N3_restriccion_larga   n3   7.05s · 8 palabras y sin «o»
+  ✅ N3_json_lista          n3   1.61s · JSON completo
+  ✅ N3_texto_inverso       n3   2.52s · esperado «reconocer» · leído «reconocer»
+
+══ :8082 · qwen3.6-35b-a3b-ud-q3_k_m · 41/48 ══
+  nivel 1: 14/16
+  nivel 2: 14/16
+  nivel 3: 13/16
+  por grupo: abstencion 0/3 · codigo 3/3 · contexto 1/1 · cuenta 13/14 · extraccion 2/2 · formato 8/8 · instruccion 6/8 · lengua 3/4 · razonamiento 5/5
+  respuestas VACÍAS: 0/48 · casos con razonamiento aparte: 48/48
+══ registro completo guardado junto a la corrida ══
+```
