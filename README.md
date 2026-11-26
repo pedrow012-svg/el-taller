@@ -49,8 +49,8 @@ Y luego el texto. **Regla de la casa:** ningún número sin su fichero de result
 **Regla del proyecto (`19-11-2026`):** ***nada se publica sin que lo hayan visto antes dos personas distintas — quien construye no se aprueba a sí mismo. La revisión se hace en la vista previa y en GitHub.***
 
 ```sh
-bash los bancos del taller propone "mensaje"      # rama + PR + vista previa. main NO se toca.
-bash los bancos del taller cierra <PR> --visto "quien construye (...) + quien decide (...)"
+bash taller.sh propone "mensaje"      # rama + PR + vista previa. main NO se toca.
+bash taller.sh cierra <PR> --visto "quien construye (...) + quien decide (...)"
 ```
 
 **La puerta vive fuera del repo, a propósito:** una puerta dentro de lo que custodia

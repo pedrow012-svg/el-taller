@@ -59,7 +59,7 @@ articulos/*.md  ──(construye.py)──▶  sitio/*.html + sitemap.xml + robo
 3. **Si el dominio sirve algo viejo:** es la caché de Pages; se fuerza reconstruyendo y empujando un commit vacío (`git commit --allow-empty`).
 4. **Si el `sitio/` no corresponde a los `.md`:** `python3 construye.py` y volver a publicar. `salud.sh` lo detecta antes que nadie porque reconstruye en copia.
 5. **Si me he equivocado publicando:** `git revert <commit>` (nunca `reset --hard` sobre algo ya publicado) y se vuelve a publicar; el historial queda, que es lo honesto.
-6. **Si el repo desapareciera:** `git clone los registros del taller taller_restaurado` — el bundle trae la historia entera.
+6. **Si el repo desapareciera:** `git clone taller_<fecha>.bundle taller_restaurado` — el bundle trae la historia entera.
 
 ## ⑦ LO QUE ESTÁ ABIERTO, Y ES DE PEDRO
 
@@ -95,11 +95,11 @@ taller-web.service  → corre salud.sh entero y lo deja en el journal
 
 **Y el daño, medido y pequeño:** **el sitio no cambió ni un byte.** Las dos primeras fueron herramientas y la ficha; la tercera, un párrafo de la ficha. `sitio/` sigue igual que en `a36f405`, y `salud.sh` lo confirma con el sha256 del dominio. **Lo que se rompió fue el procedimiento, no el producto** — y aun así se apunta, porque un procedimiento que se salta tres veces en una tarde no es un descuido: es que estaba mal puesto.
 
-**⇒ LA LECCIÓN, y es de diseño:** ***una puerta dentro de lo que custodia se puede saltar.*** **La puerta de dos tiempos vive ahora FUERA del repo**, en `los bancos del taller`, y el repo sólo guarda una copia que señala dónde está. Así no hay estado del repositorio que pueda reabrir la puerta vieja.
+**⇒ LA LECCIÓN, y es de diseño:** ***una puerta dentro de lo que custodia se puede saltar.*** **La puerta de dos tiempos vive ahora FUERA del repo**, en `taller.sh`, fuera del repo, y el repo sólo guarda una copia que señala dónde está. Así no hay estado del repositorio que pueda reabrir la puerta vieja.
 
 ```
-bash los bancos del taller propone "mensaje"     ← rama + PR + vista previa. main no se toca.
-bash los bancos del taller cierra <PR> --visto "quien construye (...) + quien decide (...)"
+bash taller.sh propone "mensaje"     ← rama + PR + vista previa. main no se toca.
+bash taller.sh cierra <PR> --visto "quien construye (...) + quien decide (...)"
 ```
 
 ---
