@@ -326,8 +326,13 @@ footer .sello-pie{
 <tbody>
 <tr>
 <td>lo que entregó</td>
-<td><code>11.101</code> bytes, <code>487</code> líneas</td>
-<td><code>6.003</code> bytes</td>
+<td><code>11.101</code> bytes, <code>444</code> líneas</td>
+<td><code>6.003</code> bytes, <code>186</code> líneas</td>
+</tr>
+<tr>
+<td>¿su código compila?</td>
+<td>sí (<code>node --check</code>)</td>
+<td>sí (<code>node --check</code>)</td>
 </tr>
 <tr>
 <td>cómo late el bucle</td>
@@ -348,15 +353,15 @@ footer .sello-pie{
 </table></div>
 <p>El veredicto, tal como se dictó después de jugar los dos, sin haber leído una línea:</p>
 <blockquote>
-<p><strong>«El defensor corre rápido y dispara bien; el otro se paga, es lento y se queda congelado.»</strong></p>
+<p><strong>«defensa orbital se juega muy bien, el defensor corre rapido y dispara bien, el otro se paga es lento y se queda congelado, el juego del 27B es muy bueno»</strong> <em>(dictado tal cual, sin comas de más)</em></p>
 </blockquote>
 <p>Y la causa no es una opinión: <strong>está en cómo late el bucle.</strong></p>
 <p><strong><code>setTimeout(gameLoop, 20)</code> no es un reloj.</strong> Es «avísame dentro de 20 ms», y el navegador puede tardar más. Y como la siguiente vuelta se pide <strong>después</strong> de hacer el trabajo, el retraso <strong>se va sumando</strong>: el juego se va frenando solo. A los pocos segundos, la nave se mueve a tirones y luego se para.</p>
 <p><strong>Y sin delta de tiempo, todo se mueve «por fotograma».</strong> Si el navegador da menos vueltas, el juego va más lento. <strong>La velocidad del juego pasa a depender de la máquina y no del juego.</strong></p>
 <p><code>requestAnimationFrame</code> es lo contrario: el navegador llama <strong>cuando toca pintar</strong> —unas sesenta veces por segundo, más en pantallas rápidas— y con <code>dt</code> el movimiento es el mismo en cualquier máquina. El tope de <code>100</code> ms es el detalle que remata: si vuelves a la pestaña después de un rato, el personaje no aparece al otro lado de la pantalla.</p>
-<p><strong>Un modelo escribió un juego que aguanta que lo dejes y vuelvas. El otro escribió uno que se congela en la primera partida.</strong> Y los dos ficheros pasan cualquier comprobación de sintaxis.</p>
+<p><strong>Un modelo escribió un juego que aguanta que lo dejes y vuelvas. El otro escribió uno que se congela en la primera partida.</strong> Y a los dos su código les pasa la comprobación de sintaxis: <code>node --check</code> da por bueno el del <code>27B</code> (<code>8.821</code> bytes de JavaScript) y el del <code>14B</code> (<code>5.574</code>). <strong>La sintaxis no distingue un juego de un cartel.</strong></p>
 <h2>Para no quedarse en la anécdota: el banco 3×3</h2>
-<p>Una anécdota no vale nada. Al día siguiente se montó un banco con <strong>tres tareas, tres pasadas y los dos motores</strong>: dieciocho pasadas, de <code>00:01:45</code> a <code>00:11:40</code>, <strong>en casa y con cero tokens de nube</strong>.</p>
+<p>Una anécdota no vale nada. Esa misma madrugada se montó un banco con <strong>tres tareas, tres pasadas y los dos motores</strong>: dieciocho pasadas, de <code>00:01:45</code> a <code>00:11:40</code>, <strong>en casa y con cero tokens de nube</strong>.</p>
 <div class="tabla"><table>
 <thead>
 <tr>

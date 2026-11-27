@@ -15,14 +15,15 @@ Mismo encargo, dos motores distintos, la misma máquina:
 
 | | `Qwen3.8-27B QUASAR` (4 bits) | `qwen2.5:14b` |
 |---|---|---|
-| lo que entregó | `11.101` bytes, `487` líneas | `6.003` bytes |
+| lo que entregó | `11.101` bytes, `444` líneas | `6.003` bytes, `186` líneas |
+| ¿su código compila? | sí (`node --check`) | sí (`node --check`) |
 | cómo late el bucle | `requestAnimationFrame` | `setTimeout(gameLoop, 20)` |
 | delta de tiempo | `performance.now()`, `dt = t - ultimoTiempo` | **ninguno** |
 | y además | `if (dt > 100) dt = 100;` — *«evita saltos grandes al volver a la pestaña»* | nada |
 
 El veredicto, tal como se dictó después de jugar los dos, sin haber leído una línea:
 
-> **«El defensor corre rápido y dispara bien; el otro se paga, es lento y se queda congelado.»**
+> **«defensa orbital se juega muy bien, el defensor corre rapido y dispara bien, el otro se paga es lento y se queda congelado, el juego del 27B es muy bueno»** *(dictado tal cual, sin comas de más)*
 
 Y la causa no es una opinión: **está en cómo late el bucle.**
 
@@ -32,11 +33,11 @@ Y la causa no es una opinión: **está en cómo late el bucle.**
 
 `requestAnimationFrame` es lo contrario: el navegador llama **cuando toca pintar** —unas sesenta veces por segundo, más en pantallas rápidas— y con `dt` el movimiento es el mismo en cualquier máquina. El tope de `100` ms es el detalle que remata: si vuelves a la pestaña después de un rato, el personaje no aparece al otro lado de la pantalla.
 
-**Un modelo escribió un juego que aguanta que lo dejes y vuelvas. El otro escribió uno que se congela en la primera partida.** Y los dos ficheros pasan cualquier comprobación de sintaxis.
+**Un modelo escribió un juego que aguanta que lo dejes y vuelvas. El otro escribió uno que se congela en la primera partida.** Y a los dos su código les pasa la comprobación de sintaxis: `node --check` da por bueno el del `27B` (`8.821` bytes de JavaScript) y el del `14B` (`5.574`). **La sintaxis no distingue un juego de un cartel.**
 
 ## Para no quedarse en la anécdota: el banco 3×3
 
-Una anécdota no vale nada. Al día siguiente se montó un banco con **tres tareas, tres pasadas y los dos motores**: dieciocho pasadas, de `00:01:45` a `00:11:40`, **en casa y con cero tokens de nube**.
+Una anécdota no vale nada. Esa misma madrugada se montó un banco con **tres tareas, tres pasadas y los dos motores**: dieciocho pasadas, de `00:01:45` a `00:11:40`, **en casa y con cero tokens de nube**.
 
 | Tarea | Criterio de PASS, comprobado por el banco |
 |---|---|
