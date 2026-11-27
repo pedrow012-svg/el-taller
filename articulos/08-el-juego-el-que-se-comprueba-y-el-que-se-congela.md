@@ -25,7 +25,7 @@ El veredicto, tal como se dictó después de jugar los dos, sin haber leído una
 
 > **«Defensa orbital se juega muy bien, el defensor corre rápido y dispara bien; el otro se pega, es lento y se queda congelado. El juego del `27B` es muy bueno»**
 
-*(Dictado en voz alta, y el dictado escribió «se paga»: **es «se pega», y lo corrigió él** al leer este artículo antes de publicarlo. Va con la corrección dentro porque el fallo no fue suyo, fue del oído de la máquina que transcribió.)*
+(Dictado en voz alta: el dictado escribió «se paga», y es **«se pega»**. Lo corrigió él al leer este artículo antes de publicarlo, y va la corrección dentro porque el fallo no fue suyo, fue del oído de la máquina que transcribió.)
 
 Y la causa no es una opinión: **está en cómo late el bucle.**
 

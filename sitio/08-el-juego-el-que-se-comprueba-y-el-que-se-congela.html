@@ -355,7 +355,7 @@ footer .sello-pie{
 <blockquote>
 <p><strong>«Defensa orbital se juega muy bien, el defensor corre rápido y dispara bien; el otro se pega, es lento y se queda congelado. El juego del <code>27B</code> es muy bueno»</strong></p>
 </blockquote>
-<p><em>(Dictado en voz alta, y el dictado escribió «se paga»: </em><em>es «se pega», y lo corrigió él</em><em> al leer este artículo antes de publicarlo. Va con la corrección dentro porque el fallo no fue suyo, fue del oído de la máquina que transcribió.)</em></p>
+<p>(Dictado en voz alta: el dictado escribió «se paga», y es <strong>«se pega»</strong>. Lo corrigió él al leer este artículo antes de publicarlo, y va la corrección dentro porque el fallo no fue suyo, fue del oído de la máquina que transcribió.)</p>
 <p>Y la causa no es una opinión: <strong>está en cómo late el bucle.</strong></p>
 <p><strong><code>setTimeout(gameLoop, 20)</code> no es un reloj.</strong> Es «avísame dentro de 20 ms», y el navegador puede tardar más. Y como la siguiente vuelta se pide <strong>después</strong> de hacer el trabajo, el retraso <strong>se va sumando</strong>: el juego se va frenando solo. A los pocos segundos, la nave se mueve a tirones y luego se para.</p>
 <p><strong>Y sin delta de tiempo, todo se mueve «por fotograma».</strong> Si el navegador da menos vueltas, el juego va más lento. <strong>La velocidad del juego pasa a depender de la máquina y no del juego.</strong></p>
