@@ -307,7 +307,7 @@ footer .sello-pie{
 </header>
 <main>
 <article>
-<p class="cejilla"><span class="tema">medidas</span><span>2026-11-27</span><span>5 min de lectura</span></p>
+<p class="cejilla"><span class="tema">medidas</span><span>2026-11-27</span><span>6 min de lectura</span></p>
 <h1>El mismo juego, dos modelos: la diferencia no fue el tamaño, fue que uno se comprueba antes de entregar</h1>
 <p class="entradilla">Pedimos a dos modelos locales que escribieran un juego, y el que juzgó si se podía jugar fue una persona con las manos, no un banco. Uno entregó un arcade que funciona; el otro, algo que se congela solo. La causa está en una línea de código, y la misma historia se repitió después con tres tareas medidas dieciocho veces.</p>
 <p>Hay una cosa que ningún banco de pruebas puede juzgar: <strong>si un juego se puede jugar</strong>. Se puede comprobar que el fichero existe, que el JavaScript no tiene errores de sintaxis, que responde. Nada de eso dice si el personaje corre o si la nave se queda clavada en el aire.</p>
@@ -353,8 +353,9 @@ footer .sello-pie{
 </table></div>
 <p>El veredicto, tal como se dictó después de jugar los dos, sin haber leído una línea:</p>
 <blockquote>
-<p><strong>«defensa orbital se juega muy bien, el defensor corre rapido y dispara bien, el otro se paga es lento y se queda congelado, el juego del 27B es muy bueno»</strong> <em>(dictado tal cual, sin comas de más)</em></p>
+<p><strong>«Defensa orbital se juega muy bien, el defensor corre rápido y dispara bien; el otro se pega, es lento y se queda congelado. El juego del <code>27B</code> es muy bueno»</strong></p>
 </blockquote>
+<p><em>(Dictado en voz alta, y el dictado escribió «se paga»: </em><em>es «se pega», y lo corrigió él</em><em> al leer este artículo antes de publicarlo. Va con la corrección dentro porque el fallo no fue suyo, fue del oído de la máquina que transcribió.)</em></p>
 <p>Y la causa no es una opinión: <strong>está en cómo late el bucle.</strong></p>
 <p><strong><code>setTimeout(gameLoop, 20)</code> no es un reloj.</strong> Es «avísame dentro de 20 ms», y el navegador puede tardar más. Y como la siguiente vuelta se pide <strong>después</strong> de hacer el trabajo, el retraso <strong>se va sumando</strong>: el juego se va frenando solo. A los pocos segundos, la nave se mueve a tirones y luego se para.</p>
 <p><strong>Y sin delta de tiempo, todo se mueve «por fotograma».</strong> Si el navegador da menos vueltas, el juego va más lento. <strong>La velocidad del juego pasa a depender de la máquina y no del juego.</strong></p>
